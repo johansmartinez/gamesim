@@ -7,9 +7,10 @@ import random
 
 class Enemy(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, time, y_step, lane):
+    def __init__(self, number_lanes, time, y_step, lane, villain):
         super().__init__()
         self.time=time
+        self.villain=villain
         self.width = 100
         self.height = 70
         self.life = 2
@@ -30,6 +31,10 @@ class Enemy(pygame.sprite.Sprite):
             
     def move_y(self):
         self.y_pos+=self.y_step
+        if ((self.y_pos+self.height)>=650) :
+            self.life=0
+            self.villain.enemy_impact(self)
+            
         
     def getPixel(self):
         width=500 - self.height - self.MARGIN

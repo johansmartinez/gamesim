@@ -7,13 +7,17 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.width = 100
         self.height = 70
-        self.energy = 100
+        self.energy = 500
         self.y_pos= 600
         self.MARGIN = 100
         self.number_lanes= number_lanes
         self.lane= int((number_lanes+1)/2)
         self.x_pos = self.getPixel()
         self.BLACK = (0,0,0)
+    
+    def decrease_energy(self, value):
+        self.energy-= value
+        return self.energy<=0
     
     def move(self, move):
         if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
