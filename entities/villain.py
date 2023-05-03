@@ -88,4 +88,7 @@ class Villain(pygame.sprite.Sprite):
         self.enemies.remove_internal(enemy)
     
     def stop(self):
-        self.hilo.join()
+        try:
+            self.hilo.join()
+        except:
+            return

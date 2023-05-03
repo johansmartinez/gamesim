@@ -63,4 +63,7 @@ class Enemy(pygame.sprite.Sprite):
         self.stop()
         
     def stop(self):
-        self.hilo.join()
+        try:
+            self.hilo.join()
+        except:
+            return
