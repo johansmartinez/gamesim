@@ -26,13 +26,15 @@ while True:
             level.stop()
             sys.exit()
     
-    clock.tick(10)
+    clock.tick(12)
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_a] :
         level.movePlayer(-1)
     elif keys[pygame.K_d]:
         level.movePlayer(1)
+    elif keys[pygame.K_k]:
+        level.shot()
         
     clock.tick(60)
     screen.fill(WHITE)

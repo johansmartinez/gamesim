@@ -15,13 +15,14 @@ class Villain(pygame.sprite.Sprite):
         self.time=time
         self.width = 100
         self.height = 70
-        self.life = 100
+        self.life = 500
         self.y_pos= 40
         self.MARGIN = 100
         self.number_lanes= number_lanes
         self.lane= int((number_lanes+1)/2)
         self.x_pos = self.getPixel()
         self.RED = (255,0,0)
+        self.rect= pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
         self.enemies=pygame.sprite.Group()
         self.actions=Markov(["enemy", "move", "stop", "good"], "stop", np.array([
             [0.01, 0.9, 0.07, 0.02],  # enemy
@@ -31,6 +32,12 @@ class Villain(pygame.sprite.Sprite):
         ]))
         self.hilo = threading.Thread(target=self.start)
         self.hilo.start()
+        
+    def get_life(self):
+        return self.life
+    
+    def get_rect(self):
+        return self.rect
     
     def move(self, move):
         if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
@@ -43,6 +50,8 @@ class Villain(pygame.sprite.Sprite):
         p= (t*(self.lane-1)) + self.MARGIN 
         return int(p)
         
+    def getEnemies(self):
+        return self.enemies
     
     #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
@@ -54,10 +63,13 @@ class Villain(pygame.sprite.Sprite):
         self.move(movimiento)
         
     def draw(self, screen):
-        rect = pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
-        pygame.draw.rect(screen, self.RED, rect)
+        self.rect = pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
+        pygame.draw.rect(screen, self.RED, self.rect)
         for e in self.enemies:
             e.draw(screen)
+    
+    def decrease_life(self, value):
+        self.life-=value
     
     def spawn_enemy(self):
         e=Enemy(self.number_lanes, self.time, 20, self.lane, self)
@@ -68,11 +80,11 @@ class Villain(pygame.sprite.Sprite):
             self.actions.next_state()
             actual=self.actions.get_actual_state()
             
-            print("Villano está", actual)
+            #print("Villano está", actual)
             self.do_action(actual)
             
             #TODO: elimianr línea 
-            self.life= self.life-1
+            #self.life= self.life-1
             
             time.sleep(self.time)
         self.stop()
@@ -85,7 +97,11 @@ class Villain(pygame.sprite.Sprite):
         
     def enemy_impact(self, enemy):
         self.level.damage_player(20)
-        self.enemies.remove_internal(enemy)
+        self.remove_enemy(enemy)
+    
+    def remove_enemy(self, enemy):
+        self.enemies.remove(enemy)
+        
     
     def stop(self):
         try:
