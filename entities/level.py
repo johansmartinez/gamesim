@@ -6,8 +6,8 @@ class Level(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.running=True
-        self.player=Player(40, self)
-        self.villain=Villain(40, 0.2, self)
+        self.player=Player(3, self)
+        self.villain=Villain(3, 0.2, self)
     
     def damage_player(self, value):
         self.player.decrease_energy(value)
