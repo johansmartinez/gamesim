@@ -3,6 +3,7 @@ import threading
 import time
 import numpy as np
 import random
+from utilities import num
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -50,9 +51,8 @@ class Enemy(pygame.sprite.Sprite):
     
     #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
-        
-        movimiento = random.choices([-1,0, 1], weights=[0.1,0.8, 0.1])[0]
-        
+        #movimiento = random.choices([-1,0, 1], weights=[0.1,0.8, 0.1])[0]
+        movimiento=num.move_model()
         self.move(movimiento)
         
     def draw(self, screen):
