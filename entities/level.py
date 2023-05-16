@@ -1,13 +1,14 @@
 import pygame
 from entities.player import Player
 from entities.villain import Villain
+from constants.GameConstants import GameConstants
 
 class Level(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move):
         super().__init__()
         self.running=True
-        self.player=Player(3, self)
-        self.villain=Villain(3, 0.2, self)
+        self.player=Player(GameConstants.LANES.value, self)
+        self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move, self)
     
     def damage_player(self, value):
         self.player.decrease_energy(value)
@@ -31,6 +32,7 @@ class Level(pygame.sprite.Sprite):
         villian_hit=projectile.get_rect().colliderect(self.villain.get_rect())
         if villian_hit:
             projectile.kill()
+            self.player.increaseEnergy(20)
             self.villain.decrease_life(20)
         
     def stop(self):

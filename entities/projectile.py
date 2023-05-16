@@ -2,44 +2,38 @@ import pygame
 import threading
 import time
 
+from constants.ViewConstants import ViewConstans
+from constants.GameConstants import GameConstants
+
+from sim.dynamics import mrua
 class Projectile(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, time, y_step, lane, player):
+    def __init__(self, number_lanes, lane, player):
         super().__init__()
-        self.time=time
+        self.in_time=0
         self.player=player
-        self.width = 20
-        self.height = 20
         self.life = 1
         self.y_pos= 600
-        self.y_step= y_step
-        self.MARGIN = 100
         self.number_lanes= number_lanes
         self.lane= lane
-        self.x_pos = self.getPixel()
-        self.COLOR =  (0, 0, 0) 
-        self.hilo = threading.Thread(target=self.start)
-        self.rect =pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
-        self.hilo.start()
+        self.x_pos = self.get_pixel()
+        self.rect =pygame.Rect((self.x_pos-(ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
+        self.thread = threading.Thread(target=self.start)
+        self.thread.start()
     
     def get_rect(self):
         return self.rect
     
-    def move(self, move):
-        if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
-            self.lane+=move
-            self.x_pos= self.getPixel()
-            
     def move_y(self):
-        self.y_pos-=self.y_step
+        self.y_pos-=mrua(GameConstants.PROJ_INITIAL_VEL.value, GameConstants.PROJ_ACELERATION.value, self.in_time)
         if (self.y_pos<=38):
             self.kill()
         self.player.validateCollisions(self)
         
-    def getPixel(self):
-        width=500 - self.height - self.MARGIN
+    def get_pixel(self):
+        width=500 - ViewConstans.PROJ_HEIGHT.value - ViewConstans.MARGIN.value
         t=width/self.number_lanes
-        p= (t*(self.lane-1)) + self.MARGIN 
+        p= (t*(self.lane-1)) + ViewConstans.MARGIN.value 
         return int(p)
     
     def kill(self):
@@ -47,18 +41,20 @@ class Projectile(pygame.sprite.Sprite):
         self.player.remove_projectile(self)
         
     def draw(self, screen):
-        self.rect = pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
-        pygame.draw.rect(screen, self.COLOR, self.rect)
+        self.rect = pygame.Rect((self.x_pos-(ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
+        pygame.draw.rect(screen, ViewConstans.PLAYER_COLOR.value, self.rect)
     
     
     def start(self):
         while self.life>0:
+            self.in_time+=GameConstants.OBJ_THREAD_TIME.value
             self.move_y()
-            time.sleep(self.time)
+            time.sleep(GameConstants.OBJ_THREAD_TIME.value)
         self.stop()
         
     def stop(self):
         try:
-            self.hilo.join()
+            self.kill()
+            self.thread.join()
         except:
             return

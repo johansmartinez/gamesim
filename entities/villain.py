@@ -5,33 +5,32 @@ import numpy as np
 import random
 
 from sim.markov import Markov
+from sim.montecarlo import montecarlo
+
 from entities.enemy import Enemy
+
+from constants.ViewConstants import ViewConstans
+from constants.GameConstants import GameConstants
 
 class Villain(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, time, level):
+    def __init__(self, number_lanes, time,life, prob_actions, prob_move,enemy_prob_move, level):
         super().__init__()
         self.level=level
         self.time=time
-        self.width = 100
-        self.height = 70
-        self.life = 500
+        self.life = life
+        self.total_life = life
         self.y_pos= 40
-        self.MARGIN = 100
+        self.enemy_prob_move=enemy_prob_move
         self.number_lanes= number_lanes
         self.lane= int((number_lanes+1)/2)
-        self.x_pos = self.getPixel()
-        self.RED = (255,0,0)
-        self.rect= pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
+        self.x_pos = self.get_pixel()
+        self.prob_move=prob_move
+        self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
         self.enemies=pygame.sprite.Group()
-        self.actions=Markov(["enemy", "move", "stop", "good"], "stop", np.array([
-            [0.01, 0.9, 0.07, 0.02],  # enemy
-            [0.2,  0.7, 0.05, 0.05],  # move
-            [0.2, 0.6, 0.01, 0.19],  # stop
-            [0.2, 0.7, 0.05, 0.05]   # good
-        ]))
-        self.hilo = threading.Thread(target=self.start)
-        self.hilo.start()
+        self.actions=Markov(GameConstants.VILLAIN_ACTIONS.value, GameConstants.VILLAIN_INTIAL_ACTION.value, np.array(prob_actions))
+        self.thread = threading.Thread(target=self.start)
+        self.thread.start()
         
     def get_life(self):
         return self.life
@@ -42,12 +41,12 @@ class Villain(pygame.sprite.Sprite):
     def move(self, move):
         if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
             self.lane+=move
-            self.x_pos= self.getPixel()
+            self.x_pos= self.get_pixel()
         
-    def getPixel(self):
-        width=500 - self.height - self.MARGIN
+    def get_pixel(self):
+        width=500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
         t=width/self.number_lanes
-        p= (t*(self.lane-1)) + self.MARGIN 
+        p= (t*(self.lane-1)) + ViewConstans.MARGIN.value 
         return int(p)
         
     def getEnemies(self):
@@ -55,16 +54,14 @@ class Villain(pygame.sprite.Sprite):
     
     #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
-        prob_izquierda = 0.5
-        prob_derecha = 0.5
-        
-        movimiento = random.choices([-1, 1], weights=[prob_izquierda, prob_derecha])[0]
-        
+        movimiento= montecarlo(GameConstants.ENEMY_MOVE.value,self.prob_move, random.random())
         self.move(movimiento)
-        
+    
     def draw(self, screen):
-        self.rect = pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
-        pygame.draw.rect(screen, self.RED, self.rect)
+        rect_life= pygame.Rect(0, 0, int(((self.life*500)/self.total_life)), 20)
+        pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, rect_life)
+        self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
+        pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, self.rect)
         for e in self.enemies:
             e.draw(screen)
     
@@ -72,7 +69,7 @@ class Villain(pygame.sprite.Sprite):
         self.life-=value
     
     def spawn_enemy(self):
-        e=Enemy(self.number_lanes, self.time, 20, self.lane, self)
+        e=Enemy(self.number_lanes, self.lane, self.enemy_prob_move,self)
         self.enemies.add(e)
     
     def start(self):
@@ -80,11 +77,7 @@ class Villain(pygame.sprite.Sprite):
             self.actions.next_state()
             actual=self.actions.get_actual_state()
             
-            #print("Villano está", actual)
             self.do_action(actual)
-            
-            #TODO: elimianr línea 
-            #self.life= self.life-1
             
             time.sleep(self.time)
         self.stop()
@@ -105,6 +98,6 @@ class Villain(pygame.sprite.Sprite):
     
     def stop(self):
         try:
-            self.hilo.join()
+            self.thread.join()
         except:
             return

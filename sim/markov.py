@@ -1,4 +1,4 @@
-import numpy as np
+import random
 
 class Markov():
     def __init__(self, states,actual, probabilities):
@@ -8,8 +8,20 @@ class Markov():
     
     def next_state(self):
         actual_state = self.states.index(self.actual)
-        n_state = np.random.choice(self.states, p=self.probabilities[actual_state])
-        self.actual=n_state
-    
+        self.actual=self.select_next_state(self.states, self.probabilities[actual_state], random.random())
+
+    def select_next_state(self,items, probabilities, r):
+        sum_prob=0
+        i=0
+        for p in probabilities:
+            sum_prob+=p
+            if r<=sum_prob:
+                break
+            else:
+                i+=1
+        if i>=len(items):
+            i=len(items)-1
+        return items[i]
+
     def get_actual_state(self):
         return self.actual

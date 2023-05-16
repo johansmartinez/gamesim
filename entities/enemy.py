@@ -4,35 +4,36 @@ import time
 import numpy as np
 import random
 
+from sim.dynamics import mru
+from sim.montecarlo import montecarlo
+
+from constants.ViewConstants import ViewConstans
+from constants.GameConstants import GameConstants
 
 class Enemy(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, time, y_step, lane, villain):
+    def __init__(self, number_lanes, lane,enemy_prob_move, villain):
         super().__init__()
-        self.time=time
+        self.in_time=0
         self.villain=villain
-        self.width = 100
-        self.height = 70
         self.life = 2
         self.y_pos= 115
-        self.y_step= y_step
-        self.MARGIN = 100
+        self.enemy_prob_move=enemy_prob_move
         self.number_lanes= number_lanes
         self.lane= lane
-        self.x_pos = self.getPixel()
-        self.COLOR =  (255, 87, 51) 
-        self.rect= pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
-        self.hilo = threading.Thread(target=self.start)
-        self.hilo.start()
+        self.x_pos = self.get_pixel()
+        self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
+        self.thread = threading.Thread(target=self.start)
+        self.thread.start()
     
     def move(self, move):
         if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
             self.lane+=move
-            self.x_pos= self.getPixel()
+            self.x_pos= self.get_pixel()
             
     def move_y(self):
-        self.y_pos+=self.y_step
-        if ((self.y_pos+self.height)>=650) :
+        self.y_pos+=mru(GameConstants.ENEMY_VEL.value, self.in_time)
+        if ((self.y_pos+ViewConstans.HEIGHT.value)>=650) :
             self.kill()
             self.villain.enemy_impact(self)
         else:
@@ -42,33 +43,33 @@ class Enemy(pygame.sprite.Sprite):
         self.life=0
         self.villain.remove_enemy(self)
         
-    def getPixel(self):
-        width=500 - self.height - self.MARGIN
+    def get_pixel(self):
+        width=500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
         t=width/self.number_lanes
-        p= (t*(self.lane-1)) + self.MARGIN 
+        p= (t*(self.lane-1)) + ViewConstans.MARGIN.value 
         return int(p)
     
     #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
         
-        movimiento = random.choices([-1,0, 1], weights=[0.1,0.8, 0.1])[0]
-        
+        movimiento= montecarlo(GameConstants.ENEMY_MOVE.value, self.enemy_prob_move, random.random())
         self.move(movimiento)
         
     def draw(self, screen):
-        self.rect = pygame.Rect((self.x_pos-(self.width/2)), self.y_pos, self.width, self.height)
-        pygame.draw.rect(screen, self.COLOR, self.rect)
+        self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
+        pygame.draw.rect(screen, ViewConstans.ENEMY_COLOR.value, self.rect)
     
     
     def start(self):
         while self.life>0:
+            self.in_time+=GameConstants.OBJ_THREAD_TIME.value
             self.move_y()
-            time.sleep(self.time)
+            time.sleep(GameConstants.OBJ_THREAD_TIME.value)
         self.stop()
         
     def stop(self):
         try:
             self.kill()
-            self.hilo.join()
+            self.thread.join()
         except:
             return

@@ -3,22 +3,19 @@ import pygame, sys
 from entities.level import Level
 
 WHITE = (255,255,255)
-GREEN = (0,255,0)
-
-BLUE = (0,0,255)
-
 
 size=(500, 700)
 
 screen = pygame.display.set_mode(size)
 
-
-tecla_a_pulsada = False
-tecla_d_pulsada = False
-
 clock = pygame.time.Clock()
 
-level=Level()
+level=Level(0.2,500, [
+            [0.01, 0.9, 0.07, 0.02],  # enemy
+            [0.2,  0.7, 0.05, 0.05],  # move
+            [0.2, 0.6, 0.01, 0.19],  # stop
+            [0.2, 0.7, 0.05, 0.05]   # good
+], [0.5, 0.5], [0.01, 0.98, 0.01])
 while True:
     clock.tick(60)
     for event in pygame.event.get():
