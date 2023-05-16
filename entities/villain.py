@@ -8,6 +8,7 @@ from sim.markov import Markov
 from sim.montecarlo import montecarlo
 
 from entities.enemy import Enemy
+from entities.item import Item
 
 from constants.ViewConstants import ViewConstans
 from constants.GameConstants import GameConstants
@@ -28,6 +29,7 @@ class Villain(pygame.sprite.Sprite):
         self.prob_move=prob_move
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
         self.enemies=pygame.sprite.Group()
+        self.items=pygame.sprite.Group()
         self.actions=Markov(GameConstants.VILLAIN_ACTIONS.value, GameConstants.VILLAIN_INTIAL_ACTION.value, np.array(prob_actions))
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
@@ -52,9 +54,12 @@ class Villain(pygame.sprite.Sprite):
     def getEnemies(self):
         return self.enemies
     
+    def getItems(self):
+        return self.items
+    
     #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
-        movimiento= montecarlo(GameConstants.ENEMY_MOVE.value,self.prob_move, random.random())
+        movimiento= montecarlo(GameConstants.VILLAIN_MOVE.value,self.prob_move, random.random())
         self.move(movimiento)
     
     def draw(self, screen):
@@ -64,6 +69,8 @@ class Villain(pygame.sprite.Sprite):
         pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, self.rect)
         for e in self.enemies:
             e.draw(screen)
+        for i in self.items:
+            i.draw(screen)
     
     def decrease_life(self, value):
         self.life-=value
@@ -71,6 +78,10 @@ class Villain(pygame.sprite.Sprite):
     def spawn_enemy(self):
         e=Enemy(self.number_lanes, self.lane, self.enemy_prob_move,self)
         self.enemies.add(e)
+        
+    def spawn_items(self):
+        i=Item(self.number_lanes, self.lane,self)
+        self.items.add(i)
     
     def start(self):
         while self.life>0:
@@ -87,6 +98,8 @@ class Villain(pygame.sprite.Sprite):
             self.select_move()
         elif state=="enemy":
             self.spawn_enemy()
+        elif state=="good":
+            self.spawn_items()
         
     def enemy_impact(self, enemy):
         self.level.damage_player(20)
@@ -94,6 +107,9 @@ class Villain(pygame.sprite.Sprite):
     
     def remove_enemy(self, enemy):
         self.enemies.remove(enemy)
+    
+    def remove_item(self, item):
+        self.items.remove(item)
         
     
     def stop(self):

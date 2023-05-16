@@ -3,7 +3,7 @@ class GameConstants(enum.Enum):
     LANES=3
     
     INITIAL_ENERGY=100
-    MAX_ENERGY=100
+    MAX_ENERGY=500
     
     PROJ_INITIAL_VEL=5
     PROJ_ACELERATION=1.2
@@ -14,4 +14,7 @@ class GameConstants(enum.Enum):
     
     VILLAIN_MOVE=[-1, 1]
     ENEMY_MOVE=[-1, 0, 1]
+    
+    ITEM_GRAVITY=1
+    
     OBJ_THREAD_TIME=0.002

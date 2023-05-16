@@ -10,3 +10,4 @@ class ViewConstans(enum.Enum):
     PLAYER_COLOR=(0,0,0)
     ENEMY_COLOR=(255, 87, 51) 
     VILLAIN_COLOR=(255,0,0)
+    ITEM_COLOR=(0,0,255)

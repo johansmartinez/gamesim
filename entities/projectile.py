@@ -26,7 +26,7 @@ class Projectile(pygame.sprite.Sprite):
     
     def move_y(self):
         self.y_pos-=mrua(GameConstants.PROJ_INITIAL_VEL.value, GameConstants.PROJ_ACELERATION.value, self.in_time)
-        if (self.y_pos<=38):
+        if (self.y_pos<=30):
             self.kill()
         self.player.validateCollisions(self)
         

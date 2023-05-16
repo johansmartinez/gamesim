@@ -29,10 +29,16 @@ class Level(pygame.sprite.Sprite):
             self.player.increaseEnergy(20)
             e.kill()
             projectile.kill()
+        collsI = pygame.sprite.spritecollide(projectile, self.villain.getItems(), True)
+        for i in collsI:
+            #TODO: aplicar efecto
+            i.kill()
+            projectile.kill()
+            
         villian_hit=projectile.get_rect().colliderect(self.villain.get_rect())
         if villian_hit:
             projectile.kill()
-            self.player.increaseEnergy(20)
+            self.player.increaseEnergy(40)
             self.villain.decrease_life(20)
         
     def stop(self):
