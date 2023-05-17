@@ -1,4 +1,6 @@
 import pygame
+import threading
+import time
 
 from entities.projectile import Projectile
 
@@ -11,12 +13,15 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, number_lanes, level):
         super().__init__()
         self.level=level
+        self.running=True
         self.energy = GameConstants.INITIAL_ENERGY.value
         self.y_pos= 600
         self.number_lanes= number_lanes
         self.lane= int((number_lanes+1)/2)
         self.x_pos = self.get_pixel()
         self.projectiles=pygame.sprite.Group()
+        self.thread = threading.Thread(target=self.start)
+        self.thread.start()
     
     def getProjectiles(self):
         return self.projectiles
@@ -33,6 +38,11 @@ class Player(pygame.sprite.Sprite):
         
     def shot(self):
         self.projectiles.add(Projectile(self.number_lanes,self.lane, self))
+    
+    def ultimate_villain(self):
+        if self.energy==GameConstants.MAX_ENERGY.value:
+            self.level.ultimate_villain()
+            self.energy=GameConstants.INITIAL_ENERGY.value
     
     def move(self, move):
         if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
@@ -58,3 +68,27 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(screen, ViewConstans.PLAYER_COLOR.value, rect)
         for p in self.projectiles:
             p.draw(screen)
+            
+    def start(self):
+        clock = pygame.time.Clock()
+        while self.running:
+            clock.tick(12)
+            keys = pygame.key.get_pressed()
+
+            if keys[pygame.K_a] :
+                self.move(-1)
+            elif keys[pygame.K_d]:
+                self.move(1)
+            elif keys[pygame.K_k]:
+                self.shot()
+            elif keys[pygame.K_l]:
+                self.ultimate_villain()
+        
+        self.stop()
+        
+    def stop(self):
+        try:
+            self.running=False
+            self.thread.join()
+        except:
+            return

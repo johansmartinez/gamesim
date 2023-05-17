@@ -5,8 +5,8 @@ class GameConstants(enum.Enum):
     INITIAL_ENERGY=100
     MAX_ENERGY=500
     
-    PROJ_INITIAL_VEL=5
-    PROJ_ACELERATION=1.2
+    PROJ_INITIAL_VEL=2
+    PROJ_ACELERATION=1
     
     ENEMY_VEL=0.3
     VILLAIN_ACTIONS=["enemy", "move", "stop", "good"]

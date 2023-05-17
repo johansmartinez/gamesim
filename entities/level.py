@@ -15,15 +15,14 @@ class Level(pygame.sprite.Sprite):
         if dead:
             self.stop()
     
+    def ultimate_villain(self):
+        dead=self.villain.ultimate_villain()
+        if dead:
+            self.stop()
+    
     def draw(self,screen):
         self.player.draw(screen)
         self.villain.draw(screen)
-        
-    def movePlayer(self, move):
-        self.player.move(move)
-        
-    def shot(self):
-        self.player.shot()
     
     def collisions(self, projectile):
         colls = pygame.sprite.spritecollide(projectile, self.villain.getEnemies(), True)
@@ -41,7 +40,10 @@ class Level(pygame.sprite.Sprite):
         if villian_hit:
             projectile.kill()
             self.player.increaseEnergy(40)
-            self.villain.decrease_life(20)
+            dead=self.villain.decrease_life(20)
+            if dead:
+                self.stop()
         
     def stop(self):
         self.villain.stop()
+        self.player.stop()
