@@ -2,7 +2,6 @@ import pygame
 import threading
 import time
 import numpy as np
-import random
 
 from sim.markov import Markov
 from sim.montecarlo import montecarlo
@@ -12,6 +11,7 @@ from entities.item import Item
 
 from constants.ViewConstants import ViewConstans
 from constants.GameConstants import GameConstants
+from utilities.random_number import RandomNumber
 
 class Villain(pygame.sprite.Sprite):
     
@@ -21,6 +21,7 @@ class Villain(pygame.sprite.Sprite):
         self.time=time
         self.life = life
         self.total_life = life
+        self.random= RandomNumber()
         self.y_pos= 40
         self.enemy_prob_move=enemy_prob_move
         self.number_lanes= number_lanes
@@ -59,7 +60,7 @@ class Villain(pygame.sprite.Sprite):
     
     #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
-        movimiento= montecarlo(GameConstants.VILLAIN_MOVE.value,self.prob_move, random.random())
+        movimiento= montecarlo(GameConstants.VILLAIN_MOVE.value,self.prob_move, self.random.calculate_ni())
         self.move(movimiento)
     
     def draw(self, screen):

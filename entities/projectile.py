@@ -6,6 +6,7 @@ from constants.ViewConstants import ViewConstans
 from constants.GameConstants import GameConstants
 
 from sim.dynamics import mrua
+
 class Projectile(pygame.sprite.Sprite):
     
     def __init__(self, number_lanes, lane, player):

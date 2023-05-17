@@ -1,14 +1,14 @@
 import pygame
 import threading
 import time
-import numpy as np
-import random
 
 from sim.dynamics import mru
 from sim.montecarlo import montecarlo
 
 from constants.ViewConstants import ViewConstans
 from constants.GameConstants import GameConstants
+
+from utilities.random_number import RandomNumber
 
 class Enemy(pygame.sprite.Sprite):
     
@@ -22,6 +22,7 @@ class Enemy(pygame.sprite.Sprite):
         self.number_lanes= number_lanes
         self.lane= lane
         self.x_pos = self.get_pixel()
+        self.random= RandomNumber()
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
@@ -49,10 +50,9 @@ class Enemy(pygame.sprite.Sprite):
         p= (t*(self.lane-1)) + ViewConstans.MARGIN.value 
         return int(p)
     
-    #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
         
-        movimiento= montecarlo(GameConstants.ENEMY_MOVE.value, self.enemy_prob_move, random.random())
+        movimiento= montecarlo(GameConstants.ENEMY_MOVE.value, self.enemy_prob_move, self.random.calculate_ni())
         self.move(movimiento)
         
     def draw(self, screen):
