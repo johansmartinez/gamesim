@@ -1,14 +1,25 @@
 import pygame
+
 from entities.player import Player
 from entities.villain import Villain
 from constants.GameConstants import GameConstants
 
 class Level(pygame.sprite.Sprite):
-    def __init__(self,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move):
+    def __init__(self,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move, prob_items):
         super().__init__()
         self.running=True
+        self.double_damage=False
+        self.frezee_flag=False
+        self.hit_count=0
+        self.max_hits=0
         self.player=Player(GameConstants.LANES.value, self)
-        self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move, self)
+        self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move,prob_items, self)
+    
+    def get_frezee_flag(self):
+        return self.frezee_flag
+    
+    def set_frezee_flag(self, value):
+        self.frezee_flag=value
     
     def damage_player(self, value):
         dead=self.player.decrease_energy(value)
@@ -32,7 +43,7 @@ class Level(pygame.sprite.Sprite):
             projectile.kill()
         collsI = pygame.sprite.spritecollide(projectile, self.villain.getItems(), True)
         for i in collsI:
-            #TODO: aplicar efecto
+            self.powerup(i.get_power())
             i.kill()
             projectile.kill()
             
@@ -40,9 +51,38 @@ class Level(pygame.sprite.Sprite):
         if villian_hit:
             projectile.kill()
             self.player.increaseEnergy(40)
-            dead=self.villain.decrease_life(20)
+            
+            dead=self.villain.decrease_life(self.calculate_damage(GameConstants.DAMAGE_SHOT.value))
             if dead:
                 self.stop()
+        
+    def calculate_damage(self, damage):
+        if self.double_damage:
+            if self.hit_count<=self.max_hits:
+                self.hit_count+=1
+                return damage*2
+            else:
+                self.double_damage=False
+                self.hit_count=0
+                self.max_hits=0
+                return damage
+        else:
+            return damage
+            
+    def double_power(self):
+        self.double_damage=True
+        self.max_hits+=GameConstants.HITS_COUNT.value
+        
+    def powerup(self, power):
+        if power=="frezee":
+            self.frezee()
+        elif power=="double":
+            self.double_power()
+        elif power=="energy":
+            self.player.increaseEnergy(20)
+    
+    def frezee(self):
+        self.frezee_flag=True
         
     def stop(self):
         self.villain.stop()

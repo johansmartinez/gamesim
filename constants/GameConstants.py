@@ -16,5 +16,11 @@ class GameConstants(enum.Enum):
     ENEMY_MOVE=[-1, 0, 1]
     
     ITEM_GRAVITY=1
+    ITEMS_POWERS=["frezee", "double", "energy"]
+    
+    DAMAGE_SHOT=20
+    
+    HITS_COUNT=3
+    FREEZE_COUNT_FLAG=10
     
     OBJ_THREAD_TIME=0.002

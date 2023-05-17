@@ -15,7 +15,7 @@ from utilities.random_number import RandomNumber
 
 class Villain(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, time,life, prob_actions, prob_move,enemy_prob_move, level):
+    def __init__(self, number_lanes, time,life, prob_actions, prob_move,enemy_prob_move, prob_items ,level):
         super().__init__()
         self.level=level
         self.time=time
@@ -23,7 +23,9 @@ class Villain(pygame.sprite.Sprite):
         self.total_life = life
         self.random= RandomNumber()
         self.y_pos= 40
+        self.frezee_count=0
         self.enemy_prob_move=enemy_prob_move
+        self.prob_items=prob_items
         self.number_lanes= number_lanes
         self.lane= int((number_lanes+1)/2)
         self.x_pos = self.get_pixel()
@@ -58,7 +60,6 @@ class Villain(pygame.sprite.Sprite):
     def getItems(self):
         return self.items
     
-    #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
         movimiento= montecarlo(GameConstants.VILLAIN_MOVE.value,self.prob_move, self.random.calculate_ni())
         self.move(movimiento)
@@ -86,15 +87,26 @@ class Villain(pygame.sprite.Sprite):
         self.enemies.add(e)
         
     def spawn_items(self):
-        i=Item(self.number_lanes, self.lane,self)
+        power=montecarlo(GameConstants.ITEMS_POWERS.value, self.prob_items, self.random.calculate_ni())
+        print(power)
+        i=Item(self.number_lanes, self.lane,power,self)
         self.items.add(i)
+        
+    def frezee(self):
+        self.frezee_count+=1
+        if self.frezee_count>=GameConstants.FREEZE_COUNT_FLAG.value:
+            self.frezee_count=0
+            self.level.set_frezee_flag(False)
     
     def start(self):
         while self.life>0:
-            self.actions.next_state()
-            actual=self.actions.get_actual_state()
-            
-            self.do_action(actual)
+            if self.level.get_frezee_flag():
+                self.frezee()
+            else:    
+                self.actions.next_state()
+                actual=self.actions.get_actual_state()
+
+                self.do_action(actual)
             
             time.sleep(self.time)
         self.stop()

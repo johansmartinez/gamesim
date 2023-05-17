@@ -12,10 +12,11 @@ from constants.GameConstants import GameConstants
 
 class Item(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, lane, villain):
+    def __init__(self, number_lanes, lane,power, villain):
         super().__init__()
         self.in_time=0
         self.villain=villain
+        self.power=power
         self.life = 2
         self.y_pos= 115
         self.number_lanes= number_lanes
@@ -24,6 +25,9 @@ class Item(pygame.sprite.Sprite):
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
+    
+    def get_power(self):
+        return self.power
     
     def move_y(self):
         self.y_pos+=free_fall(GameConstants.ITEM_GRAVITY.value, self.in_time)
@@ -40,7 +44,6 @@ class Item(pygame.sprite.Sprite):
         p= (t*(self.lane-1)) + ViewConstans.MARGIN.value 
         return int(p)
     
-    #TODO: cambiar a uno pseudoaletorio
     def select_move(self):
         
         movimiento= montecarlo(GameConstants.ENEMY_MOVE.value, self.enemy_prob_move, random.random())
