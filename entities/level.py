@@ -11,7 +11,9 @@ class Level(pygame.sprite.Sprite):
         self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move, self)
     
     def damage_player(self, value):
-        self.player.decrease_energy(value)
+        dead=self.player.decrease_energy(value)
+        if dead:
+            self.stop()
     
     def draw(self,screen):
         self.player.draw(screen)
