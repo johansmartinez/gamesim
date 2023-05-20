@@ -1,6 +1,5 @@
 import pygame
 import threading
-import time
 
 from entities.projectile import Projectile
 
@@ -31,6 +30,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         # Asignar posición del rectángulo
         self.rect.center = (self.x_pos, self.y_pos)
+        pygame.mixer.init()
     
     def getProjectiles(self):
         return self.projectiles
@@ -46,10 +46,14 @@ class Player(pygame.sprite.Sprite):
         self.projectiles.remove(projectile)
         
     def shot(self):
+        shot_sound = pygame.mixer.Sound("resources/music/shot.wav")
+        pygame.mixer.Sound.play(shot_sound)
         self.projectiles.add(Projectile(self.number_lanes,self.lane, self))
     
     def ultimate_villain(self):
         if self.energy==GameConstants.MAX_ENERGY.value:
+            shot_sound = pygame.mixer.Sound("resources/music/ultimate.wav")
+            pygame.mixer.Sound.play(shot_sound)
             self.level.ultimate_villain()
             self.energy=GameConstants.INITIAL_ENERGY.value
     

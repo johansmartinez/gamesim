@@ -14,6 +14,7 @@ class Level(pygame.sprite.Sprite):
         self.max_hits=0
         self.player=Player(GameConstants.LANES.value, self)
         self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move,prob_items,path_level, self)
+        pygame.mixer.init()
     
     def get_frezee_flag(self):
         return self.frezee_flag
@@ -38,7 +39,9 @@ class Level(pygame.sprite.Sprite):
     def collisions(self, projectile):
         colls = pygame.sprite.spritecollide(projectile, self.villain.getEnemies(), True)
         for e in colls:
-            self.player.increaseEnergy(20)
+            ve_sound = pygame.mixer.Sound("resources/music/hit.wav")
+            pygame.mixer.Sound.play(ve_sound)
+            self.player.increaseEnergy(10)
             e.kill()
             projectile.kill()
         collsI = pygame.sprite.spritecollide(projectile, self.villain.getItems(), True)
@@ -49,6 +52,8 @@ class Level(pygame.sprite.Sprite):
             
         villian_hit=projectile.get_rect().colliderect(self.villain.get_rect())
         if villian_hit:
+            vh_sound = pygame.mixer.Sound("resources/music/hit_villain.wav")
+            pygame.mixer.Sound.play(vh_sound)
             projectile.kill()
             self.player.increaseEnergy(40)
             
@@ -70,6 +75,8 @@ class Level(pygame.sprite.Sprite):
             return damage
             
     def double_power(self):
+        double_sound = pygame.mixer.Sound("resources/music/double.wav")
+        pygame.mixer.Sound.play(double_sound)
         self.double_damage=True
         self.max_hits+=GameConstants.HITS_COUNT.value
         
@@ -79,9 +86,13 @@ class Level(pygame.sprite.Sprite):
         elif power=="double":
             self.double_power()
         elif power=="energy":
+            energy_sound = pygame.mixer.Sound("resources/music/energy.wav")
+            pygame.mixer.Sound.play(energy_sound)
             self.player.increaseEnergy(20)
     
     def frezee(self):
+        frezee_sound = pygame.mixer.Sound("resources/music/frezee.wav")
+        pygame.mixer.Sound.play(frezee_sound)
         self.frezee_flag=True
         
     def stop(self):

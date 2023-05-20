@@ -22,6 +22,7 @@ class Villain(pygame.sprite.Sprite):
         self.time=time
         self.life = life
         self.total_life = life
+        self.ultimate=False
         self.random= RandomNumber()
         self.y_pos= 40
         self.frezee_count=0
@@ -57,6 +58,8 @@ class Villain(pygame.sprite.Sprite):
             self.x_pos = self.get_pixel()
             self.rect.center = (self.x_pos, self.y_pos+30)  # Actualizar la posición del rectángulo
 
+    def set_ultimate(self, value):
+        self.ultimate=value
         
     def get_pixel(self):
         width = 500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
@@ -89,6 +92,10 @@ class Villain(pygame.sprite.Sprite):
         rect_life= pygame.Rect(0, 0, int(((self.life*500)/self.total_life)), 20)
         pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, rect_life)
         screen.blit(self.image, self.rect)  # Dibujar la imagen en lugar del rectángulo
+        if self.ultimate:
+            rect_ultimate=pygame.Rect(self.get_pixel(), 45, 70,71)
+            ult_image = pygame.image.load("resources/images/player/ult.png").convert_alpha()
+            screen.blit(ult_image, rect_ultimate)
         for e in self.enemies:
             e.draw(screen)
         for i in self.items:
@@ -99,6 +106,7 @@ class Villain(pygame.sprite.Sprite):
         return self.life<=0
     
     def ultimate_villain(self):
+        self.ultimate=True
         self.life-=self.total_life/25
         return self.life<=0
     
@@ -119,6 +127,8 @@ class Villain(pygame.sprite.Sprite):
     
     def start(self):
         while self.life > 0:
+            if self.ultimate:
+                self.ultimate=False
             if self.level.get_frezee_flag():
                 self.frezee()
             else:
