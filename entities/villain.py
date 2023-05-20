@@ -15,9 +15,10 @@ from utilities.random_number import RandomNumber
 
 class Villain(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, time,life, prob_actions, prob_move,enemy_prob_move, prob_items ,level):
+    def __init__(self, number_lanes, time,life, prob_actions, prob_move,enemy_prob_move, prob_items ,path_level,level):
         super().__init__()
         self.level=level
+        self.path_level=path_level
         self.time=time
         self.life = life
         self.total_life = life
@@ -38,13 +39,11 @@ class Villain(pygame.sprite.Sprite):
         self.thread.start()
         
         # Cargar imagen del villano
-        self.image = pygame.image.load("resources/images/boss1.png").convert_alpha()
+        self.get_boss_image()
         # Ajustar tamaño de la imagen si es necesario
         # self.image = pygame.transform.scale(self.image, (ancho, alto))
         # Obtener rectángulo del área ocupada por la imagen
-        self.rect = self.image.get_rect()
-        # Asignar posición del rectángulo
-        self.rect.center = (self.x_pos, self.y_pos+30)
+        
         
     def get_life(self):
         return self.life
@@ -75,7 +74,18 @@ class Villain(pygame.sprite.Sprite):
         movimiento= montecarlo(GameConstants.VILLAIN_MOVE.value,self.prob_move, self.random.calculate_ni())
         self.move(movimiento)
     
+    def get_boss_image(self):
+        path="resources/images/"
+        if self.level.get_frezee_flag():
+            path+=f"{self.path_level}/boss_frezee.png"
+        else:
+            path+=f"{self.path_level}/boss.png"
+        self.image = pygame.image.load(path).convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x_pos, self.y_pos+30)
+    
     def draw(self, screen):
+        self.get_boss_image()
         rect_life= pygame.Rect(0, 0, int(((self.life*500)/self.total_life)), 20)
         pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, rect_life)
         screen.blit(self.image, self.rect)  # Dibujar la imagen en lugar del rectángulo
@@ -98,7 +108,6 @@ class Villain(pygame.sprite.Sprite):
         
     def spawn_items(self):
         power=montecarlo(GameConstants.ITEMS_POWERS.value, self.prob_items, self.random.calculate_ni())
-        print(power)
         i=Item(self.number_lanes, self.lane,power,self)
         self.items.add(i)
         

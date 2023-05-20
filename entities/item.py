@@ -18,6 +18,8 @@ class Item(pygame.sprite.Sprite):
         self.villain=villain
         self.power=power
         self.life = 2
+        self.image=None
+        self.set_image_by_power()
         self.y_pos= 115
         self.number_lanes= number_lanes
         self.lane= lane
@@ -26,6 +28,14 @@ class Item(pygame.sprite.Sprite):
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
     
+    def set_image_by_power(self):
+        if self.power=="frezee":
+            self.image=pygame.image.load("resources/images/items/frezee.png")
+        elif self.power=="double":
+            self.image=pygame.image.load("resources/images/items/double.png")
+        else:
+            self.image=pygame.image.load("resources/images/items/energy.png")
+        
     def get_power(self):
         return self.power
     
@@ -51,7 +61,7 @@ class Item(pygame.sprite.Sprite):
         
     def draw(self, screen):
         self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
-        pygame.draw.rect(screen, ViewConstans.ITEM_COLOR.value, self.rect)
+        screen.blit(self.image, self.rect) 
     
     
     def start(self):

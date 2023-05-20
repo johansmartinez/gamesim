@@ -5,7 +5,7 @@ from entities.villain import Villain
 from constants.GameConstants import GameConstants
 
 class Level(pygame.sprite.Sprite):
-    def __init__(self,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move, prob_items):
+    def __init__(self,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move, prob_items,path_level):
         super().__init__()
         self.running=True
         self.double_damage=False
@@ -13,7 +13,7 @@ class Level(pygame.sprite.Sprite):
         self.hit_count=0
         self.max_hits=0
         self.player=Player(GameConstants.LANES.value, self)
-        self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move,prob_items, self)
+        self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move,prob_items,path_level, self)
     
     def get_frezee_flag(self):
         return self.frezee_flag

@@ -24,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.thread.start()
         
         # Cargar imagen del personaje
-        self.image = pygame.image.load("resources/images/player.png").convert_alpha()
+        self.image = pygame.image.load("resources/images/player/player.png").convert_alpha()
         # Ajustar tamaño de la imagen si es necesario
         # self.image = pygame.transform.scale(self.image, (ancho, alto))
         # Obtener rectángulo del área ocupada por la imagen
