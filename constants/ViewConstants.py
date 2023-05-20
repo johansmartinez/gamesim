@@ -4,8 +4,8 @@ class ViewConstans(enum.Enum):
     HEIGHT=70
     MARGIN=100
     
-    PROJ_WIDTH=20
-    PROJ_HEIGHT=20
+    PROJ_WIDTH=70
+    PROJ_HEIGHT=70
     
     PLAYER_COLOR=(0,0,0)
     ENEMY_COLOR=(255, 87, 51) 

@@ -18,7 +18,8 @@ class Projectile(pygame.sprite.Sprite):
         self.number_lanes= number_lanes
         self.lane= lane
         self.x_pos = self.get_pixel()
-        self.rect =pygame.Rect((self.x_pos-(ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
+        self.rect = pygame.Rect((self.x_pos-(ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
+        self.image = pygame.image.load("resources/images/disparo.png")  # Cargar la imagen del disparo
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
     
@@ -26,29 +27,28 @@ class Projectile(pygame.sprite.Sprite):
         return self.rect
     
     def move_y(self):
-        self.y_pos-=mrua(GameConstants.PROJ_INITIAL_VEL.value, GameConstants.PROJ_ACELERATION.value, self.in_time)
-        if (self.y_pos<=30):
+        self.y_pos -= mrua(GameConstants.PROJ_INITIAL_VEL.value, GameConstants.PROJ_ACELERATION.value, self.in_time)
+        if self.y_pos <= 30:
             self.kill()
         self.player.validateCollisions(self)
         
     def get_pixel(self):
-        width=500 - ViewConstans.PROJ_HEIGHT.value - ViewConstans.MARGIN.value
-        t=width/self.number_lanes
-        p= (t*(self.lane-1)) + ViewConstans.MARGIN.value 
+        width = 500 - ViewConstans.PROJ_HEIGHT.value - ViewConstans.MARGIN.value
+        t = width / self.number_lanes
+        p = (t * (self.lane - 1)) + ViewConstans.MARGIN.value 
         return int(p)
     
     def kill(self):
-        self.life=0
+        self.life = 0
         self.player.remove_projectile(self)
         
     def draw(self, screen):
-        self.rect = pygame.Rect((self.x_pos-(ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
-        pygame.draw.rect(screen, ViewConstans.PLAYER_COLOR.value, self.rect)
-    
+        self.rect = pygame.Rect((self.x_pos - (ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
+        screen.blit(self.image, self.rect)  # Dibujar la imagen en lugar del rectángulo
     
     def start(self):
-        while self.life>0:
-            self.in_time+=GameConstants.OBJ_THREAD_TIME.value
+        while self.life > 0:
+            self.in_time += GameConstants.OBJ_THREAD_TIME.value
             self.move_y()
             time.sleep(GameConstants.OBJ_THREAD_TIME.value)
         self.stop()
