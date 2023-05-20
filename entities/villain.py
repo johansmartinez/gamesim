@@ -45,6 +45,12 @@ class Villain(pygame.sprite.Sprite):
         # self.image = pygame.transform.scale(self.image, (ancho, alto))
         # Obtener rectángulo del área ocupada por la imagen
         
+        # Cargar imagen de corazón
+        self.heart_image = pygame.image.load("resources/images/heart.png").convert_alpha()
+        self.heart_rect = self.heart_image.get_rect()
+        # Cargar imagen corazon vacio
+        self.loss_heart_image = pygame.image.load("resources/images/loss_heart.png").convert_alpha()
+        self.loss_heart_rect = self.heart_image.get_rect()
         
     def get_life(self):
         return self.life
@@ -89,8 +95,24 @@ class Villain(pygame.sprite.Sprite):
     
     def draw(self, screen):
         self.get_boss_image()
-        rect_life= pygame.Rect(0, 0, int(((self.life*500)/self.total_life)), 20)
-        pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, rect_life)
+        
+        # Dibujar barra de vida
+        heart_width = 20
+        heart_height = 20
+        heart_padding = 5
+        max_hearts = int(self.total_life / 40)
+        remaining_hearts = int(self.life / 40)
+
+        for i in range(max_hearts):
+            heart_x = i * (heart_width + heart_padding)
+            heart_y = 0
+            heart_rect = pygame.Rect(heart_x, heart_y, heart_width, heart_height)
+            if i < remaining_hearts:
+                screen.blit(self.heart_image, heart_rect)
+            else:
+                screen.blit(self.loss_heart_image, heart_rect)# Dibujar corazones vacíos
+        
+        
         screen.blit(self.image, self.rect)  # Dibujar la imagen en lugar del rectángulo
         if self.ultimate:
             rect_ultimate=pygame.Rect(self.get_pixel(), 45, 70,71)
