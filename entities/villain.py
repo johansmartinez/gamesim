@@ -24,6 +24,7 @@ class Villain(pygame.sprite.Sprite):
         self.total_life = life
         self.ultimate=False
         self.random= RandomNumber()
+        self.max_frezee=0
         self.y_pos= 40
         self.frezee_count=0
         self.enemy_prob_move=enemy_prob_move
@@ -143,9 +144,13 @@ class Villain(pygame.sprite.Sprite):
         
     def frezee(self):
         self.frezee_count+=1
-        if self.frezee_count>=GameConstants.FREEZE_COUNT_FLAG.value:
+        if self.frezee_count>=self.max_frezee:
             self.frezee_count=0
+            self.max_frezee=0
             self.level.set_frezee_flag(False)
+    
+    def add_frezee_time(self, value):
+        self.max_frezee+=value
     
     def start(self):
         while self.life > 0:

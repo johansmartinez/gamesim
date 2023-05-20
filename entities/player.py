@@ -22,8 +22,6 @@ class Player(pygame.sprite.Sprite):
         
         # Cargar imagen del personaje
         self.image = pygame.image.load("resources/images/player/player.png").convert_alpha()
-        self.battery_image = pygame.image.load("resources/images/battery.png").convert_alpha()
-        self.bar_image = pygame.image.load("resources/images/bar.png").convert_alpha()
         
         # Obtener rectángulo del área ocupada por la imagen
         self.rect = self.image.get_rect()
@@ -75,11 +73,20 @@ class Player(pygame.sprite.Sprite):
         else:
             self.energy = GameConstants.MAX_ENERGY.value
         
+    def get_number_energy(self):
+        return int((self.energy *24)/GameConstants.MAX_ENERGY.value)
+        
     def draw(self, screen):
+        number_bars=self.get_number_energy()
+        for i in range(number_bars):
+            #Barritas de energia
+            energy_rect = pygame.Rect(455, (170 + (GameConstants.MAX_ENERGY.value -((i+1)*20))), 10, 20)
+            bar_image = pygame.image.load("resources/images/bar.png").convert_alpha()
+            screen.blit(bar_image, energy_rect)
+            
+        battery_image = pygame.image.load("resources/images/battery.png").convert_alpha()
         battery_rect = pygame.Rect(450, 170, 20, GameConstants.MAX_ENERGY.value)
-        screen.blit(self.battery_image, battery_rect)
-        energy_rect = pygame.Rect(455, 170 + (GameConstants.MAX_ENERGY.value - self.energy), 10, self.energy)
-        screen.blit(self.bar_image, energy_rect)
+        screen.blit(battery_image, battery_rect)
         screen.blit(self.image, self.rect)
         for p in self.projectiles:
             p.draw(screen)

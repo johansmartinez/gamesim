@@ -94,6 +94,7 @@ class Level(pygame.sprite.Sprite):
         frezee_sound = pygame.mixer.Sound("resources/music/frezee.wav")
         pygame.mixer.Sound.play(frezee_sound)
         self.frezee_flag=True
+        self.villain.add_frezee_time(GameConstants.FREEZE_COUNT_FLAG.value)
         
     def stop(self):
         self.villain.stop()
