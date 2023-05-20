@@ -22,6 +22,15 @@ class Player(pygame.sprite.Sprite):
         self.projectiles=pygame.sprite.Group()
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
+        
+        # Cargar imagen del personaje
+        self.image = pygame.image.load("resources/images/player.png").convert_alpha()
+        # Ajustar tamaño de la imagen si es necesario
+        # self.image = pygame.transform.scale(self.image, (ancho, alto))
+        # Obtener rectángulo del área ocupada por la imagen
+        self.rect = self.image.get_rect()
+        # Asignar posición del rectángulo
+        self.rect.center = (self.x_pos, self.y_pos)
     
     def getProjectiles(self):
         return self.projectiles
@@ -45,9 +54,11 @@ class Player(pygame.sprite.Sprite):
             self.energy=GameConstants.INITIAL_ENERGY.value
     
     def move(self, move):
-        if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
-            self.lane+=move
-            self.x_pos= self.get_pixel()
+        if ((self.lane + move) >= 1) and ((self.lane + move) <= self.number_lanes):
+            self.lane += move
+            self.x_pos = self.get_pixel()
+            # Actualizar la posición del rectángulo con las nuevas coordenadas
+            self.rect.center = (self.x_pos, self.y_pos)
         
     def get_pixel(self):
         width=500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
@@ -64,8 +75,7 @@ class Player(pygame.sprite.Sprite):
     def draw(self, screen):
         rect2 = pygame.Rect(450, (170+(GameConstants.MAX_ENERGY.value-self.energy)), 20, self.energy)
         pygame.draw.rect(screen, ViewConstans.PLAYER_COLOR.value, rect2)
-        rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
-        pygame.draw.rect(screen, ViewConstans.PLAYER_COLOR.value, rect)
+        screen.blit(self.image, self.rect)
         for p in self.projectiles:
             p.draw(screen)
             

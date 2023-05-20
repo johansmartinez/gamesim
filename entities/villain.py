@@ -37,6 +37,15 @@ class Villain(pygame.sprite.Sprite):
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
         
+        # Cargar imagen del villano
+        self.image = pygame.image.load("resources/images/boss1.png").convert_alpha()
+        # Ajustar tamaño de la imagen si es necesario
+        # self.image = pygame.transform.scale(self.image, (ancho, alto))
+        # Obtener rectángulo del área ocupada por la imagen
+        self.rect = self.image.get_rect()
+        # Asignar posición del rectángulo
+        self.rect.center = (self.x_pos, self.y_pos+30)
+        
     def get_life(self):
         return self.life
     
@@ -44,14 +53,16 @@ class Villain(pygame.sprite.Sprite):
         return self.rect
     
     def move(self, move):
-        if ((self.lane +move)>= 1) and ((self.lane + move)<=self.number_lanes):
-            self.lane+=move
-            self.x_pos= self.get_pixel()
+        if ((self.lane + move) >= 1) and ((self.lane + move) <= self.number_lanes):
+            self.lane += move
+            self.x_pos = self.get_pixel()
+            self.rect.center = (self.x_pos, self.y_pos+30)  # Actualizar la posición del rectángulo
+
         
     def get_pixel(self):
-        width=500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
-        t=width/self.number_lanes
-        p= (t*(self.lane-1)) + ViewConstans.MARGIN.value 
+        width = 500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
+        t = width / self.number_lanes
+        p = (t * (self.lane - 1)) + ViewConstans.MARGIN.value
         return int(p)
         
     def getEnemies(self):
@@ -67,8 +78,7 @@ class Villain(pygame.sprite.Sprite):
     def draw(self, screen):
         rect_life= pygame.Rect(0, 0, int(((self.life*500)/self.total_life)), 20)
         pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, rect_life)
-        self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
-        pygame.draw.rect(screen, ViewConstans.VILLAIN_COLOR.value, self.rect)
+        screen.blit(self.image, self.rect)  # Dibujar la imagen en lugar del rectángulo
         for e in self.enemies:
             e.draw(screen)
         for i in self.items:
@@ -99,15 +109,15 @@ class Villain(pygame.sprite.Sprite):
             self.level.set_frezee_flag(False)
     
     def start(self):
-        while self.life>0:
+        while self.life > 0:
             if self.level.get_frezee_flag():
                 self.frezee()
-            else:    
+            else:
                 self.actions.next_state()
-                actual=self.actions.get_actual_state()
+                actual = self.actions.get_actual_state()
 
                 self.do_action(actual)
-            
+
             time.sleep(self.time)
         self.stop()
         
