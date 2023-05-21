@@ -3,7 +3,7 @@ class GameConstants(enum.Enum):
     MAX_LEVELS=5
     LANES=3
     
-    INITIAL_ENERGY=1
+    INITIAL_ENERGY=100
     MAX_ENERGY=500
     
     PROJ_INITIAL_VEL=2

@@ -3,6 +3,7 @@ import sys
 import json
 import threading
 import time
+import ctypes
 
 from button.Button import Button
 from game_controller import GameController
@@ -17,8 +18,8 @@ class MenuController():
         self.gc=None
         self.clock = pygame.time.Clock()
         self.BG = pygame.image.load("resources/assets/backmenu.png")
+        
         self.main_menu()
-        pygame.mixer.init()
         
     def read_level(self):
         path = "resources/config/level.json"
@@ -29,11 +30,7 @@ class MenuController():
         return pygame.font.Font("resources/assets/font.ttf", size)
 
     def restart(self):
-        for t in threading.enumerate():
-            try:
-                t.join()
-            except:
-                print()
+        pygame.mixer.init()
         self.gc=None
         r_flag=True
         ve_sound = pygame.mixer.Sound("resources/music/lose.wav")
@@ -45,16 +42,34 @@ class MenuController():
             self.screen.blit(IM, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    r_flag=False
+                    self.close()
             
             pygame.display.update()
             time.sleep(3)
             r_flag=False
-            
-        pygame.quit()
-        sys.exit()
         
+        for t in threading.enumerate():
+            try:
+                if t.getName()!='MainThread':
+                    thread_id = t.ident
+                    thread_object = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
+                    if thread_object == 0:
+                        raise ValueError("El hilo no pudo ser detenido")
+            except Exception as e:
+                print(str(e))
+        
+        self.close()
+        
+    def close(self):
+        try:
+            pygame.display.quit()
+            pygame.mixer.quit()
+            pygame.quit()
+            sys.exit()
+        except Exception as e:
+            print(str(e))
+            
     def instructions(self):
         i_flag=True
         while i_flag:

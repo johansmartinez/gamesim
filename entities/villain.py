@@ -38,15 +38,9 @@ class Villain(pygame.sprite.Sprite):
         self.enemies=pygame.sprite.Group()
         self.items=pygame.sprite.Group()
         self.actions=Markov(GameConstants.VILLAIN_ACTIONS.value, GameConstants.VILLAIN_INTIAL_ACTION.value, np.array(prob_actions))
-        self.thread = threading.Thread(target=self.start_villain)
-        self.thread.start()
         
         # Cargar imagen del villano
         self.get_boss_image()
-        # Ajustar tamaño de la imagen si es necesario
-        # self.image = pygame.transform.scale(self.image, (ancho, alto))
-        # Obtener rectángulo del área ocupada por la imagen
-        
         # Cargar imagen de corazón
         self.heart_image = pygame.image.load("resources/images/heart.png").convert_alpha()
         self.heart_rect = self.heart_image.get_rect()
@@ -54,6 +48,9 @@ class Villain(pygame.sprite.Sprite):
         self.loss_heart_image = pygame.image.load("resources/images/loss_heart.png").convert_alpha()
         self.loss_heart_rect = self.heart_image.get_rect()
         
+        self.thread = threading.Thread(target=self.start_villain)
+        self.thread.start()
+
     def is_alive(self):
         return self.life>0
         
@@ -139,16 +136,20 @@ class Villain(pygame.sprite.Sprite):
     
     def spawn_enemy(self):
         try:
-            e=Enemy(self.number_lanes, self.lane, self.enemy_prob_move,self.path_level,self)
-            self.enemies.add(e)
+            if self.running:
+                e=Enemy(self.number_lanes, self.lane, self.enemy_prob_move,self.path_level,self)
+                self.enemies.add(e)
+                e.start()
         except:
             return
         
     def spawn_items(self):
         try:
-            power=montecarlo(GameConstants.ITEMS_POWERS.value, self.prob_items, self.random.calculate_ni())
-            i=Item(self.number_lanes, self.lane,power,self)
-            self.items.add(i)
+            if self.running:
+                power=montecarlo(GameConstants.ITEMS_POWERS.value, self.prob_items, self.random.calculate_ni())
+                i=Item(self.number_lanes, self.lane,power,self)
+                self.items.add(i)
+                i.start()
         except:
             return
         

@@ -28,6 +28,7 @@ class Item(pygame.sprite.Sprite):
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
         self.thread = threading.Thread(target=self.start_item)
         self.thread.start()
+        
     
     def set_image_by_power(self):
         if self.power=="frezee":
@@ -62,8 +63,9 @@ class Item(pygame.sprite.Sprite):
         self.move(movimiento)
         
     def draw(self, screen):
-        self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
-        screen.blit(self.image, self.rect) 
+        if self.running:
+            self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
+            screen.blit(self.image, self.rect) 
     
     
     def start_item(self):

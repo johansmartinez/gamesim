@@ -50,7 +50,9 @@ class Player(pygame.sprite.Sprite):
         if self.running:
             shot_sound = pygame.mixer.Sound("resources/music/shot.wav")
             pygame.mixer.Sound.play(shot_sound)
-            self.projectiles.add(Projectile(self.number_lanes, self.lane, self))
+            p=Projectile(self.number_lanes, self.lane, self)
+            self.projectiles.add(p)
+            p.start()
     
     def ultimate_villain(self):
         if self.running:

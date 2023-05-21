@@ -24,7 +24,7 @@ class Enemy(pygame.sprite.Sprite):
         self.number_lanes= number_lanes
         self.lane= lane
         self.running=True
-        self.finish= threading.Event()
+        self.killing=False
         self.x_pos = self.get_pixel()
         self.random= RandomNumber()
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
@@ -42,21 +42,28 @@ class Enemy(pygame.sprite.Sprite):
         
     def move_y(self):
         self.y_pos+=mru(GameConstants.ENEMY_VEL.value, self.in_time)
+        
         if not self.running:
             self.running=False
             self.kill()
         else:
             if ((self.y_pos+ViewConstans.HEIGHT.value)>=650) :
+                if self.running and self.villain!=None:
+                    self.villain.enemy_impact(self)
                 self.kill()
-                self.villain.enemy_impact(self)
             else:
                 self.select_move()
         
     def kill(self):
-        self.finish.set()
-        self.running=False
-        self.life=0
-        self.villain.remove_enemy(self)
+        if not self.killing:
+            self.killing=True
+            print("kill enemigo")
+            self.running=False
+            self.life=0
+            if self.villain!=None:
+                self.villain.remove_enemy(self)
+            self.stop()
+            self.villain=None
         
     def get_pixel(self):
         width=500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
@@ -74,16 +81,14 @@ class Enemy(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect) 
     
     def start_enemy(self):
-        while not self.finish.is_set():
+        while self.running:
             self.in_time+=GameConstants.OBJ_THREAD_TIME.value
             self.move_y()
             time.sleep(GameConstants.OBJ_THREAD_TIME.value)
-        self.stop()
+        self.kill()
         
     def stop(self):
-        self.finish.set()
         try:
-            self.kill()
             thread_id = self.thread.ident
             thread_object = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
             if thread_object == 0:
