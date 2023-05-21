@@ -25,12 +25,12 @@ class GameController():
         clock = pygame.time.Clock()
         self.running_level=True
         while self.running_level:
-            print("init")
             clock.tick(60)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running_level=False
-                    self.actual_level.stop()
+                    if self.actual_level!=None:
+                        self.actual_level.kill()
                     sys.exit()
             if self.actual_level!=None:
                 self.actual_level.draw(self.screen)
@@ -39,6 +39,7 @@ class GameController():
             
     def finish_level(self):
         self.running_level=False
+        self.actual_level.kill()
         self.actual_level=None
         self.menus.restart()
     

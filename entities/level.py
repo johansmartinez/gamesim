@@ -5,7 +5,7 @@ from entities.villain import Villain
 from constants.GameConstants import GameConstants
 from constants.ViewConstants import ViewConstans
 
-class Level(pygame.sprite.Sprite):
+class Level():
     def __init__(self,control,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move, prob_items,path_level):
         super().__init__()
         self.running=True
@@ -28,11 +28,13 @@ class Level(pygame.sprite.Sprite):
     def damage_player(self, value):
         dead=self.player.decrease_energy(value)
         if dead:
+            print("jugador muerto")
             self.stop()
     
     def ultimate_villain(self):
         dead=self.villain.ultimate_villain()
         if dead:
+            print("villano muerto")
             self.stop()
     
     def draw(self, screen):
@@ -65,7 +67,13 @@ class Level(pygame.sprite.Sprite):
             
             dead=self.villain.decrease_life(self.calculate_damage(GameConstants.DAMAGE_SHOT.value))
             if dead:
+                print("villano muerto")
                 self.stop()
+        
+    def kill(self):
+        self.running=False
+        self.villain.stop()
+        self.player.stop()
         
     def calculate_damage(self, damage):
         if self.double_damage:
@@ -107,13 +115,10 @@ class Level(pygame.sprite.Sprite):
 
     def stop(self):
         if not self.stopping:
-            print("stop")
             self.stopping=True
-            self.villain.stop()
-            self.player.stop()
-            self.control.finish_level()
+            self.kill()
             print("iswin? ", self.isWin())
             if self.isWin():
                 self.control.next_level()
             else:
-                self.control.restart()
+                self.control.finish_level()

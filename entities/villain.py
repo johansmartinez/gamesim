@@ -178,12 +178,13 @@ class Villain(pygame.sprite.Sprite):
         self.stop()
         
     def do_action(self, state):
-        if state=="move":
-            self.select_move()
-        elif state=="enemy":
-            self.spawn_enemy()
-        elif state=="good":
-            self.spawn_items()
+        if self.running:
+            if state=="move":
+                self.select_move()
+            elif state=="enemy":
+                self.spawn_enemy()
+            elif state=="good":
+                self.spawn_items()
         
     def enemy_impact(self, enemy):
         self.level.damage_player(20)
@@ -205,6 +206,10 @@ class Villain(pygame.sprite.Sprite):
     def stop(self):
         self.running=False
         try:
+            for i in self.items:
+                i.kill()
+            for e in self.enemies:
+                e.kill()
             self.items=pygame.sprite.Group()
             self.enemies=pygame.sprite.Group()
             self.thread.join()

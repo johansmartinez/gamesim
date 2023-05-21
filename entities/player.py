@@ -46,24 +46,27 @@ class Player(pygame.sprite.Sprite):
         self.projectiles.remove(projectile)
         
     def shot(self):
-        shot_sound = pygame.mixer.Sound("resources/music/shot.wav")
-        pygame.mixer.Sound.play(shot_sound)
-        self.projectiles.add(Projectile(self.number_lanes, self.lane, self))
+        if self.running:
+            shot_sound = pygame.mixer.Sound("resources/music/shot.wav")
+            pygame.mixer.Sound.play(shot_sound)
+            self.projectiles.add(Projectile(self.number_lanes, self.lane, self))
     
     def ultimate_villain(self):
-        if self.energy == GameConstants.MAX_ENERGY.value:
-            shot_sound = pygame.mixer.Sound("resources/music/ultimate.wav")
-            pygame.mixer.Sound.play(shot_sound)
-            self.level.ultimate_villain()
-            self.energy = GameConstants.INITIAL_ENERGY.value
+        if self.running:
+            if self.energy == GameConstants.MAX_ENERGY.value:
+                shot_sound = pygame.mixer.Sound("resources/music/ultimate.wav")
+                pygame.mixer.Sound.play(shot_sound)
+                self.level.ultimate_villain()
+                self.energy = GameConstants.INITIAL_ENERGY.value
     
     def move(self, move):
-        if 1 <= (self.lane + move) <= self.number_lanes:
-            self.lane += move
-            self.x_pos = self.get_pixel()
-            # Actualizar la posición del rectángulo con las nuevas coordenadas
-            self.rect.center = (self.x_pos, self.y_pos)
-        
+        if self.running:
+            if 1 <= (self.lane + move) <= self.number_lanes:
+                self.lane += move
+                self.x_pos = self.get_pixel()
+                # Actualizar la posición del rectángulo con las nuevas coordenadas
+                self.rect.center = (self.x_pos, self.y_pos)
+            
     def get_pixel(self):
         width = 500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
         t = width / self.number_lanes
