@@ -1,6 +1,7 @@
 import pygame
 import threading
 import time
+import ctypes
 
 from sim.dynamics import mru
 from sim.montecarlo import montecarlo
@@ -22,11 +23,13 @@ class Enemy(pygame.sprite.Sprite):
         self.enemy_prob_move=enemy_prob_move
         self.number_lanes= number_lanes
         self.lane= lane
+        self.running=True
+        self.finish= threading.Event()
         self.x_pos = self.get_pixel()
         self.random= RandomNumber()
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
         self.image=pygame.image.load(f"resources/images/{self.path_level}/enemy.png")
-        self.thread = threading.Thread(target=self.start)
+        self.thread = threading.Thread(target=self.start_enemy)
         self.thread.start()
     
     def move(self, move):
@@ -34,15 +37,24 @@ class Enemy(pygame.sprite.Sprite):
             self.lane+=move
             self.x_pos= self.get_pixel()
             
+    def set_running(self,value):
+        self.running=value
+        
     def move_y(self):
         self.y_pos+=mru(GameConstants.ENEMY_VEL.value, self.in_time)
-        if ((self.y_pos+ViewConstans.HEIGHT.value)>=650) :
+        if not self.running:
+            self.running=False
             self.kill()
-            self.villain.enemy_impact(self)
         else:
-            self.select_move()
+            if ((self.y_pos+ViewConstans.HEIGHT.value)>=650) :
+                self.kill()
+                self.villain.enemy_impact(self)
+            else:
+                self.select_move()
         
     def kill(self):
+        self.finish.set()
+        self.running=False
         self.life=0
         self.villain.remove_enemy(self)
         
@@ -61,16 +73,20 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
         screen.blit(self.image, self.rect) 
     
-    def start(self):
-        while self.life>0:
+    def start_enemy(self):
+        while not self.finish.is_set():
             self.in_time+=GameConstants.OBJ_THREAD_TIME.value
             self.move_y()
             time.sleep(GameConstants.OBJ_THREAD_TIME.value)
         self.stop()
         
     def stop(self):
+        self.finish.set()
         try:
             self.kill()
-            self.thread.join()
+            thread_id = self.thread.ident
+            thread_object = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
+            if thread_object == 0:
+                raise ValueError("El hilo no pudo ser detenido")
         except:
             return

@@ -38,7 +38,7 @@ class Villain(pygame.sprite.Sprite):
         self.enemies=pygame.sprite.Group()
         self.items=pygame.sprite.Group()
         self.actions=Markov(GameConstants.VILLAIN_ACTIONS.value, GameConstants.VILLAIN_INTIAL_ACTION.value, np.array(prob_actions))
-        self.thread = threading.Thread(target=self.start)
+        self.thread = threading.Thread(target=self.start_villain)
         self.thread.start()
         
         # Cargar imagen del villano
@@ -162,7 +162,7 @@ class Villain(pygame.sprite.Sprite):
     def add_frezee_time(self, value):
         self.max_frezee+=value
     
-    def start(self):
+    def start_villain(self):
         while self.running:
             if self.ultimate:
                 self.ultimate=False
@@ -175,6 +175,9 @@ class Villain(pygame.sprite.Sprite):
                 self.do_action(actual)
 
             time.sleep(self.time)
+        for e in self.enemies:
+            e.set_running(False)
+            e.stop()
         self.stop()
         
     def do_action(self, state):
@@ -205,13 +208,11 @@ class Villain(pygame.sprite.Sprite):
     
     def stop(self):
         self.running=False
-        try:
-            for i in self.items:
-                i.kill()
-            for e in self.enemies:
-                e.kill()
-            self.items=pygame.sprite.Group()
-            self.enemies=pygame.sprite.Group()
-            self.thread.join()
-        except:
-            return
+        
+        for i in self.items:
+            i.stop()
+        for e in self.enemies:
+            e.stop()
+        self.items=pygame.sprite.Group()
+        self.enemies=pygame.sprite.Group()
+        

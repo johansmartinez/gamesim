@@ -1,5 +1,9 @@
 import pygame
 import sys
+import json
+import threading
+import time
+
 from button.Button import Button
 from game_controller import GameController
 
@@ -10,39 +14,43 @@ class MenuController():
         self.size = (500, 700)
         pygame.display.set_caption("Código maestro")
         self.screen = pygame.display.set_mode(self.size)
-
+        self.gc=None
         self.clock = pygame.time.Clock()
         self.BG = pygame.image.load("resources/assets/backmenu.png")
         self.main_menu()
+        
+    def read_level(self):
+        path = "resources/config/level.json"
+        with open(path, "r") as file:
+            return json.load( file)
 
     def get_font(self, size): # Returns Press-Start-2P in the desired size
         return pygame.font.Font("resources/assets/font.ttf", size)
 
     def restart(self):
-        i_flag=True
-        while i_flag:
+        for t in threading.enumerate():
+            try:
+                t.run()
+            except:
+                pass
+        self.gc=None
+        r_flag=True
+        while r_flag:
             self.screen.fill('black')
-            MENU_MOUSE_POS = pygame.mouse.get_pos()
-
-            QUIT_BUTTON = Button(image=None, pos=(250, 600), 
-                                text_input="Regresar", font=self.get_font(25), base_color="#d7fcd4", hovering_color="orange")
-
-            for button in [QUIT_BUTTON]:
-                button.changeColor(MENU_MOUSE_POS)
-                button.update(self.screen)
-            
+            IM = pygame.image.load("resources/assets/game over.png")
+            self.screen.blit(IM, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    
-                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
-                        i_flag=False
-                        self.main_menu()
-
+            
             pygame.display.update()
-    
+            time.sleep(3)
+            r_flag=False
+            
+        pygame.quit()
+        sys.exit()
+        
     def instructions(self):
         i_flag=True
         while i_flag:
@@ -71,10 +79,11 @@ class MenuController():
                         i_flag=False
                         self.main_menu()
 
-            pygame.display.update()
+            pygame.display.flip()
             
     def play(self):
-        gc=GameController(self.screen, self)
+        N_L=self.read_level()['level']
+        self.gc=GameController(self.screen,N_L, self)
 
     def main_menu(self):
         mm_flag=True
@@ -107,7 +116,7 @@ class MenuController():
                         self.play()
                     if INSTR_BUTTON.checkForInput(MENU_MOUSE_POS):
                         mm_flag=False
-                        self.instructions()
+                        self.restart()
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         mm_flag=False
                         pygame.quit()

@@ -20,7 +20,7 @@ class Projectile(pygame.sprite.Sprite):
         self.x_pos = self.get_pixel()
         self.rect = pygame.Rect((self.x_pos-(ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
         self.image = pygame.image.load("resources/images/player/proj.png")  # Cargar la imagen del disparo
-        self.thread = threading.Thread(target=self.start)
+        self.thread = threading.Thread(target=self.start_proj)
         self.thread.start()
     
     def get_rect(self):
@@ -46,7 +46,7 @@ class Projectile(pygame.sprite.Sprite):
         self.rect = pygame.Rect((self.x_pos - (ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
         screen.blit(self.image, self.rect)  # Dibujar la imagen en lugar del rectángulo
     
-    def start(self):
+    def start_proj(self):
         while self.life > 0:
             self.in_time += GameConstants.OBJ_THREAD_TIME.value
             self.move_y()

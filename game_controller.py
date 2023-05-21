@@ -1,21 +1,31 @@
 import pygame
 import sys
-from button.Button import Button
+import json
 
 from entities.level import Level 
 from constants.GameConstants import GameConstants
 
 class GameController():
-    def __init__(self, screen, menus):
-        self.number_level=1
+    def __init__(self, screen,level ,menus):
+        self.number_level=level
+        self.write_level()
         self.actual_level=None
         self.screen=screen
         self.menus=menus
         self.running_level=False
-        self.screen.fill('black')
-        pygame.display.update()
         self.init()
         
+    def write_level(self):
+        path = "resources/config/level.json"
+        level_dict={
+            'level':self.number_level
+        }
+        with open(path, "w") as file:
+            json.dump(level_dict, file)
+        
+    def get_number_level(self):
+        return self.number_level
+    
     def get_font(self, size): # Returns Press-Start-2P in the desired size
         return pygame.font.Font("resources/assets/font.ttf", size)
     
@@ -39,16 +49,16 @@ class GameController():
             
     def finish_level(self):
         self.running_level=False
-        self.actual_level.kill()
         self.actual_level=None
         self.menus.restart()
     
     def next_level(self):
         if (self.number_level+1)>GameConstants.MAX_LEVELS.value:
-            print('finalizó todo')
             #TODO: videó final
+            pass
         else:
             self.number_level=self.number_level+1
+            self.write_level()
             self.get_level_instance()
             
     def get_level_instance(self):

@@ -1,5 +1,6 @@
 import pygame
 import threading
+import ctypes
 
 from entities.projectile import Projectile
 from constants.ViewConstants import ViewConstans
@@ -17,9 +18,6 @@ class Player(pygame.sprite.Sprite):
         self.lane = int((number_lanes + 1) / 2)
         self.x_pos = self.get_pixel()
         self.projectiles = pygame.sprite.Group()
-        self.thread = threading.Thread(target=self.start)
-        self.thread.start()
-        
         # Cargar imagen del personaje
         self.image = pygame.image.load("resources/images/player/player.png").convert_alpha()
         
@@ -28,6 +26,9 @@ class Player(pygame.sprite.Sprite):
         # Asignar posición del rectángulo
         self.rect.center = (self.x_pos, self.y_pos)
         pygame.mixer.init()
+        self.thread = threading.Thread(target=self.start_player)
+        self.thread.start()
+        
         
     def is_alive(self):
         return self.energy>0
@@ -66,7 +67,7 @@ class Player(pygame.sprite.Sprite):
                 self.x_pos = self.get_pixel()
                 # Actualizar la posición del rectángulo con las nuevas coordenadas
                 self.rect.center = (self.x_pos, self.y_pos)
-            
+
     def get_pixel(self):
         width = 500 - ViewConstans.HEIGHT.value - ViewConstans.MARGIN.value
         t = width / self.number_lanes
@@ -97,7 +98,7 @@ class Player(pygame.sprite.Sprite):
         for p in self.projectiles:
             p.draw(screen)
             
-    def start(self):
+    def start_player(self):
         clock = pygame.time.Clock()
         while self.running:
             clock.tick(12)
@@ -116,8 +117,15 @@ class Player(pygame.sprite.Sprite):
         
     def stop(self):
         try:
+            for p in self.projectiles:
+                p.stop()
             self.projectiles=pygame.sprite.Group()
             self.running = False
-            self.thread.join()
-        except:
+            if self.thread.is_alive():
+                thread_id = self.thread.ident
+                thread_object = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
+                if thread_object == 0:
+                    raise ValueError("El hilo no pudo ser detenido")
+                
+        except Exception as e:
             return

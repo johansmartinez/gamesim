@@ -1,8 +1,8 @@
 import pygame
 import threading
 import time
-import numpy as np
 import random
+import ctypes
 
 from sim.dynamics import free_fall
 from sim.montecarlo import montecarlo
@@ -23,9 +23,10 @@ class Item(pygame.sprite.Sprite):
         self.y_pos= 115
         self.number_lanes= number_lanes
         self.lane= lane
+        self.running=True
         self.x_pos = self.get_pixel()
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
-        self.thread = threading.Thread(target=self.start)
+        self.thread = threading.Thread(target=self.start_item)
         self.thread.start()
     
     def set_image_by_power(self):
@@ -45,6 +46,7 @@ class Item(pygame.sprite.Sprite):
             self.kill()
         
     def kill(self):
+        self.running=False
         self.life=0
         self.villain.remove_item(self)
         
@@ -64,8 +66,8 @@ class Item(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect) 
     
     
-    def start(self):
-        while self.life>0:
+    def start_item(self):
+        while self.running:
             self.in_time+=GameConstants.OBJ_THREAD_TIME.value
             self.move_y()
             time.sleep(GameConstants.OBJ_THREAD_TIME.value)
@@ -74,6 +76,10 @@ class Item(pygame.sprite.Sprite):
     def stop(self):
         try:
             self.kill()
-            self.thread.join()
+            if self.thread.is_alive():
+                thread_id = self.thread.ident
+                thread_object = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
+                if thread_object == 0:
+                    raise ValueError("El hilo no pudo ser detenido")
         except:
             return

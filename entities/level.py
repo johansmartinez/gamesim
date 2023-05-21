@@ -1,4 +1,5 @@
 import pygame
+import time
 
 from entities.player import Player
 from entities.villain import Villain
@@ -28,21 +29,21 @@ class Level():
     def damage_player(self, value):
         dead=self.player.decrease_energy(value)
         if dead:
-            print("jugador muerto")
             self.stop()
     
     def ultimate_villain(self):
         dead=self.villain.ultimate_villain()
         if dead:
-            print("villano muerto")
             self.stop()
     
     def draw(self, screen):
         background_image = pygame.image.load("resources/images/bg1.png").convert()
         background_image = pygame.transform.scale(background_image, ViewConstans.WINDOW_SIZE.value)
         screen.blit(background_image, (0, 0))  # Dibujar imagen de fondo
-        self.player.draw(screen)
-        self.villain.draw(screen)
+        if self.player!=None:
+            self.player.draw(screen)
+        if self.villain!=None:
+            self.villain.draw(screen)
     
     def collisions(self, projectile):
         colls = pygame.sprite.spritecollide(projectile, self.villain.getEnemies(), True)
@@ -67,7 +68,6 @@ class Level():
             
             dead=self.villain.decrease_life(self.calculate_damage(GameConstants.DAMAGE_SHOT.value))
             if dead:
-                print("villano muerto")
                 self.stop()
         
     def kill(self):
@@ -87,7 +87,7 @@ class Level():
                 return damage
         else:
             return damage
-            
+    
     def double_power(self):
         double_sound = pygame.mixer.Sound("resources/music/double.wav")
         pygame.mixer.Sound.play(double_sound)
@@ -117,8 +117,11 @@ class Level():
         if not self.stopping:
             self.stopping=True
             self.kill()
-            print("iswin? ", self.isWin())
+            pygame.mixer.quit()
             if self.isWin():
+                self.villain=None
+                self.player=None
                 self.control.next_level()
             else:
+                time.sleep(0.6)
                 self.control.finish_level()
