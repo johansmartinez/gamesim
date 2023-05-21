@@ -18,6 +18,31 @@ class MenuController():
     def get_font(self, size): # Returns Press-Start-2P in the desired size
         return pygame.font.Font("resources/assets/font.ttf", size)
 
+    def restart(self):
+        i_flag=True
+        while i_flag:
+            self.screen.fill('black')
+            MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+            QUIT_BUTTON = Button(image=None, pos=(250, 600), 
+                                text_input="Regresar", font=self.get_font(25), base_color="#d7fcd4", hovering_color="orange")
+
+            for button in [QUIT_BUTTON]:
+                button.changeColor(MENU_MOUSE_POS)
+                button.update(self.screen)
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    
+                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        i_flag=False
+                        self.main_menu()
+
+            pygame.display.update()
+    
     def instructions(self):
         i_flag=True
         while i_flag:
@@ -89,6 +114,3 @@ class MenuController():
                         sys.exit()
 
             pygame.display.update()
-
-
-MenuController()

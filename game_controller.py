@@ -19,30 +19,6 @@ class GameController():
     def get_font(self, size): # Returns Press-Start-2P in the desired size
         return pygame.font.Font("resources/assets/font.ttf", size)
     
-    def restart(self):
-        i_flag=True
-        while i_flag:
-            self.screen.fill('black')
-            MENU_MOUSE_POS = pygame.mouse.get_pos()
-
-            QUIT_BUTTON = Button(image=None, pos=(250, 600), 
-                                text_input="Regresar", font=self.get_font(25), base_color="#d7fcd4", hovering_color="orange")
-
-            for button in [QUIT_BUTTON]:
-                button.changeColor(MENU_MOUSE_POS)
-                button.update(self.screen)
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    
-                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
-                        i_flag=False
-                        self.menus.main_menu()
-
-            pygame.display.update()
         
     def init(self):
         self.get_level_instance()
@@ -64,6 +40,7 @@ class GameController():
     def finish_level(self):
         self.running_level=False
         self.actual_level=None
+        self.menus.restart()
     
     def next_level(self):
         if (self.number_level+1)>GameConstants.MAX_LEVELS.value:

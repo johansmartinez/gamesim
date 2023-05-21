@@ -71,6 +71,6 @@ class Enemy(pygame.sprite.Sprite):
     def stop(self):
         try:
             self.kill()
-            self.thread.exit()
+            self.thread.join()
         except:
             return

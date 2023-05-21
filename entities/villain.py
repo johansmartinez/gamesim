@@ -207,6 +207,6 @@ class Villain(pygame.sprite.Sprite):
         try:
             self.items=pygame.sprite.Group()
             self.enemies=pygame.sprite.Group()
-            self.thread.exit()
+            self.thread.join()
         except:
             return

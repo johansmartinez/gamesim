@@ -115,6 +115,6 @@ class Player(pygame.sprite.Sprite):
         try:
             self.projectiles=pygame.sprite.Group()
             self.running = False
-            self.thread.exit()
+            self.thread.join()
         except:
             return

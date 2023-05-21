@@ -107,10 +107,12 @@ class Level(pygame.sprite.Sprite):
 
     def stop(self):
         if not self.stopping:
+            print("stop")
             self.stopping=True
             self.villain.stop()
             self.player.stop()
             self.control.finish_level()
+            print("iswin? ", self.isWin())
             if self.isWin():
                 self.control.next_level()
             else:
