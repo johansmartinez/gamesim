@@ -1,5 +1,6 @@
 import enum
 class ViewConstans(enum.Enum):
+    WINDOW_SIZE= (500, 700)
     WIDTH=100
     HEIGHT=70
     MARGIN=100
@@ -11,3 +12,5 @@ class ViewConstans(enum.Enum):
     ENEMY_COLOR=(255, 87, 51) 
     VILLAIN_COLOR=(255,0,0)
     ITEM_COLOR=(0,0,255)
+    
+    VILLAIN_HEARTS=20

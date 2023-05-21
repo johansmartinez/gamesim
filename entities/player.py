@@ -28,6 +28,9 @@ class Player(pygame.sprite.Sprite):
         # Asignar posición del rectángulo
         self.rect.center = (self.x_pos, self.y_pos)
         pygame.mixer.init()
+        
+    def is_alive(self):
+        return self.energy>0
     
     def getProjectiles(self):
         return self.projectiles
@@ -110,7 +113,8 @@ class Player(pygame.sprite.Sprite):
         
     def stop(self):
         try:
+            self.projectiles=pygame.sprite.Group()
             self.running = False
-            self.thread.join()
-        except Exception as e:
-            print(f"Error stopping the player thread: {e}")
+            self.thread.exit()
+        except:
+            return

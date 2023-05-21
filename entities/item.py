@@ -74,6 +74,6 @@ class Item(pygame.sprite.Sprite):
     def stop(self):
         try:
             self.kill()
-            self.thread.join()
+            self.thread.exit()
         except:
             return

@@ -21,6 +21,7 @@ class Villain(pygame.sprite.Sprite):
         self.path_level=path_level
         self.time=time
         self.life = life
+        self.running=True
         self.total_life = life
         self.ultimate=False
         self.random= RandomNumber()
@@ -52,6 +53,9 @@ class Villain(pygame.sprite.Sprite):
         # Cargar imagen corazon vacio
         self.loss_heart_image = pygame.image.load("resources/images/loss_heart.png").convert_alpha()
         self.loss_heart_rect = self.heart_image.get_rect()
+        
+    def is_alive(self):
+        return self.life>0
         
     def get_life(self):
         return self.life
@@ -101,8 +105,8 @@ class Villain(pygame.sprite.Sprite):
         heart_width = 20
         heart_height = 20
         heart_padding = 5
-        max_hearts = int(self.total_life / 40)
-        remaining_hearts = int(self.life / 40)
+        max_hearts = ViewConstans.VILLAIN_HEARTS.value
+        remaining_hearts = int(round((max_hearts*self.life)/self.total_life ) )
 
         for i in range(max_hearts):
             heart_x = i * (heart_width + heart_padding)
@@ -134,13 +138,19 @@ class Villain(pygame.sprite.Sprite):
         return self.life<=0
     
     def spawn_enemy(self):
-        e=Enemy(self.number_lanes, self.lane, self.enemy_prob_move,self)
-        self.enemies.add(e)
+        try:
+            e=Enemy(self.number_lanes, self.lane, self.enemy_prob_move,self.path_level,self)
+            self.enemies.add(e)
+        except:
+            return
         
     def spawn_items(self):
-        power=montecarlo(GameConstants.ITEMS_POWERS.value, self.prob_items, self.random.calculate_ni())
-        i=Item(self.number_lanes, self.lane,power,self)
-        self.items.add(i)
+        try:
+            power=montecarlo(GameConstants.ITEMS_POWERS.value, self.prob_items, self.random.calculate_ni())
+            i=Item(self.number_lanes, self.lane,power,self)
+            self.items.add(i)
+        except:
+            return
         
     def frezee(self):
         self.frezee_count+=1
@@ -153,7 +163,7 @@ class Villain(pygame.sprite.Sprite):
         self.max_frezee+=value
     
     def start(self):
-        while self.life > 0:
+        while self.running:
             if self.ultimate:
                 self.ultimate=False
             if self.level.get_frezee_flag():
@@ -180,14 +190,23 @@ class Villain(pygame.sprite.Sprite):
         self.remove_enemy(enemy)
     
     def remove_enemy(self, enemy):
-        self.enemies.remove(enemy)
+        try:
+            self.enemies.remove(enemy)
+        except:
+            return
     
     def remove_item(self, item):
-        self.items.remove(item)
+        try:
+            self.items.remove(item)
+        except:
+            return
         
     
     def stop(self):
+        self.running=False
         try:
-            self.thread.join()
+            self.items=pygame.sprite.Group()
+            self.enemies=pygame.sprite.Group()
+            self.thread.exit()
         except:
             return

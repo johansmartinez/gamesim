@@ -12,10 +12,11 @@ from utilities.random_number import RandomNumber
 
 class Enemy(pygame.sprite.Sprite):
     
-    def __init__(self, number_lanes, lane,enemy_prob_move, villain):
+    def __init__(self, number_lanes, lane,enemy_prob_move,path_level, villain):
         super().__init__()
         self.in_time=0
         self.villain=villain
+        self.path_level=path_level
         self.life = 2
         self.y_pos= 115
         self.enemy_prob_move=enemy_prob_move
@@ -24,6 +25,7 @@ class Enemy(pygame.sprite.Sprite):
         self.x_pos = self.get_pixel()
         self.random= RandomNumber()
         self.rect= pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
+        self.image=pygame.image.load(f"resources/images/{self.path_level}/enemy.png")
         self.thread = threading.Thread(target=self.start)
         self.thread.start()
     
@@ -57,8 +59,7 @@ class Enemy(pygame.sprite.Sprite):
         
     def draw(self, screen):
         self.rect = pygame.Rect((self.x_pos-(ViewConstans.WIDTH.value/2)), self.y_pos, ViewConstans.WIDTH.value, ViewConstans.HEIGHT.value)
-        pygame.draw.rect(screen, ViewConstans.ENEMY_COLOR.value, self.rect)
-    
+        screen.blit(self.image, self.rect) 
     
     def start(self):
         while self.life>0:
@@ -70,6 +71,6 @@ class Enemy(pygame.sprite.Sprite):
     def stop(self):
         try:
             self.kill()
-            self.thread.join()
+            self.thread.exit()
         except:
             return

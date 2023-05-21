@@ -3,14 +3,17 @@ import pygame
 from entities.player import Player
 from entities.villain import Villain
 from constants.GameConstants import GameConstants
+from constants.ViewConstants import ViewConstans
 
 class Level(pygame.sprite.Sprite):
-    def __init__(self,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move, prob_items,path_level):
+    def __init__(self,control,reaction_villian, villain_life, villain_actions,villain_prob_move, enemy_prob_move, prob_items,path_level):
         super().__init__()
         self.running=True
+        self.control=control
         self.double_damage=False
         self.frezee_flag=False
         self.hit_count=0
+        self.stopping=False
         self.max_hits=0
         self.player=Player(GameConstants.LANES.value, self)
         self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move,prob_items,path_level, self)
@@ -32,7 +35,10 @@ class Level(pygame.sprite.Sprite):
         if dead:
             self.stop()
     
-    def draw(self,screen):
+    def draw(self, screen):
+        background_image = pygame.image.load("resources/images/bg1.png").convert()
+        background_image = pygame.transform.scale(background_image, ViewConstans.WINDOW_SIZE.value)
+        screen.blit(background_image, (0, 0))  # Dibujar imagen de fondo
         self.player.draw(screen)
         self.villain.draw(screen)
     
@@ -96,6 +102,16 @@ class Level(pygame.sprite.Sprite):
         self.frezee_flag=True
         self.villain.add_frezee_time(GameConstants.FREEZE_COUNT_FLAG.value)
         
+    def isWin(self):
+        return self.player.is_alive() and not self.villain.is_alive()
+
     def stop(self):
-        self.villain.stop()
-        self.player.stop()
+        if not self.stopping:
+            self.stopping=True
+            self.villain.stop()
+            self.player.stop()
+            self.control.finish_level()
+            if self.isWin():
+                self.control.next_level()
+            else:
+                self.control.restart()

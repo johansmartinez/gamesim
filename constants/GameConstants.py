@@ -1,5 +1,6 @@
 import enum
 class GameConstants(enum.Enum):
+    MAX_LEVELS=5
     LANES=3
     
     INITIAL_ENERGY=100
