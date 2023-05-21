@@ -28,6 +28,8 @@ class Level():
     
     def damage_player(self, value):
         dead=self.player.decrease_energy(value)
+        hp_sound = pygame.mixer.Sound("resources/music/hit_player.wav")
+        pygame.mixer.Sound.play(hp_sound)
         if dead:
             self.stop()
     

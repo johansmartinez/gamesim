@@ -18,6 +18,7 @@ class MenuController():
         self.clock = pygame.time.Clock()
         self.BG = pygame.image.load("resources/assets/backmenu.png")
         self.main_menu()
+        pygame.mixer.init()
         
     def read_level(self):
         path = "resources/config/level.json"
@@ -30,13 +31,16 @@ class MenuController():
     def restart(self):
         for t in threading.enumerate():
             try:
-                t.run()
+                t.join()
             except:
-                pass
+                print()
         self.gc=None
         r_flag=True
+        ve_sound = pygame.mixer.Sound("resources/music/lose.wav")
+        pygame.mixer.Sound.play(ve_sound)
         while r_flag:
             self.screen.fill('black')
+            
             IM = pygame.image.load("resources/assets/game over.png")
             self.screen.blit(IM, (0, 0))
             for event in pygame.event.get():
