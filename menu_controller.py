@@ -37,8 +37,7 @@ class MenuController():
         pygame.mixer.Sound.play(ve_sound)
         while r_flag:
             self.screen.fill('black')
-            
-            IM = pygame.image.load("resources/assets/game over.png")
+            IM = pygame.image.load("resources/assets/gameover.png")
             self.screen.blit(IM, (0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -113,8 +112,8 @@ class MenuController():
             MENU_MOUSE_POS = pygame.mouse.get_pos()
 
 
-            PLAY_BUTTON = Button(image=None, pos=(180, 500), 
-                                text_input="Nuevo Juego", font=self.get_font(25), base_color="#d7fcd4", hovering_color="orange")
+            PLAY_BUTTON = Button(image=None, pos=(100, 500), 
+                                text_input="Jugar", font=self.get_font(25), base_color="#d7fcd4", hovering_color="orange")
             INSTR_BUTTON = Button(image=None, pos=(200, 550), 
                                 text_input="Instrucciones", font=self.get_font(25), base_color="#d7fcd4", hovering_color="orange")
             QUIT_BUTTON = Button(image=None, pos=(100, 600), 
@@ -135,7 +134,7 @@ class MenuController():
                         self.play()
                     if INSTR_BUTTON.checkForInput(MENU_MOUSE_POS):
                         mm_flag=False
-                        self.restart()
+                        self.instructions()
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         mm_flag=False
                         pygame.quit()

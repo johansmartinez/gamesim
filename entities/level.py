@@ -19,6 +19,8 @@ class Level():
         self.player=Player(GameConstants.LANES.value, self)
         self.villain=Villain(GameConstants.LANES.value,reaction_villian,villain_life, villain_actions,villain_prob_move,enemy_prob_move,prob_items,path_level, self)
         pygame.mixer.init()
+        back_music = pygame.mixer.Sound(f"resources/music/{path_level}/back.mp3")
+        pygame.mixer.Sound.play(back_music, -1) 
     
     def get_frezee_flag(self):
         return self.frezee_flag

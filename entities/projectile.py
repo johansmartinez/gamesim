@@ -21,6 +21,8 @@ class Projectile(pygame.sprite.Sprite):
         self.rect = pygame.Rect((self.x_pos-(ViewConstans.PROJ_WIDTH.value/2)), self.y_pos, ViewConstans.PROJ_WIDTH.value, ViewConstans.PROJ_HEIGHT.value)
         self.image = pygame.image.load("resources/images/player/proj.png")  # Cargar la imagen del disparo
         self.thread = threading.Thread(target=self.start_proj)
+        
+    def start(self):
         self.thread.start()
     
     def get_rect(self):
