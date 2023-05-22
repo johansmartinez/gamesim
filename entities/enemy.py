@@ -57,7 +57,6 @@ class Enemy(pygame.sprite.Sprite):
     def kill(self):
         if not self.killing:
             self.killing=True
-            print("kill enemigo")
             self.running=False
             self.life=0
             if self.villain!=None:

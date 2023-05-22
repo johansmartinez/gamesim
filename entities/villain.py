@@ -131,7 +131,9 @@ class Villain(pygame.sprite.Sprite):
     
     def ultimate_villain(self):
         self.ultimate=True
-        self.life-=self.total_life/25
+        self.life= self.life-self.total_life/25
+        if self.life==0:
+            self.life=1
         return self.life<=0
     
     def spawn_enemy(self):

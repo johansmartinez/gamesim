@@ -28,6 +28,37 @@ class MenuController():
 
     def get_font(self, size): # Returns Press-Start-2P in the desired size
         return pygame.font.Font("resources/assets/font.ttf", size)
+    
+    def end(self):
+        pygame.mixer.init()
+        self.gc=None
+        r_flag=True
+        ve_sound = pygame.mixer.Sound("resources/music/win.wav")
+        pygame.mixer.Sound.play(ve_sound)
+        while r_flag:
+            self.screen.fill('black')
+            IM = pygame.image.load("resources/assets/end.png")
+            self.screen.blit(IM, (0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    r_flag=False
+                    self.close()
+            
+            pygame.display.update()
+            time.sleep(5)
+            r_flag=False
+        
+        for t in threading.enumerate():
+            try:
+                if t.getName()!='MainThread':
+                    thread_id = t.ident
+                    thread_object = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
+                    if thread_object == 0:
+                        raise ValueError("El hilo no pudo ser detenido")
+            except Exception as e:
+                print(str(e))
+        
+        self.close()
 
     def restart(self):
         pygame.mixer.init()

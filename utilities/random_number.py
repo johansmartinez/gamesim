@@ -1,9 +1,10 @@
+import time
 class RandomNumber():
 
     def __init__(self):
         self.a=9
         self.c=3
-        self.m=256
+        self.m=time.time()
         self.xi=4
         self.min=0
         self.max=1
