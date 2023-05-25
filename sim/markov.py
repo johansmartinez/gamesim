@@ -1,5 +1,5 @@
 from utilities.random_number import RandomNumber
-
+#solo lo usa villano para todas las acciones del jefe
 class Markov():
     def __init__(self, states,actual, probabilities):
         self.states=states

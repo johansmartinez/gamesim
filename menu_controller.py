@@ -1,9 +1,13 @@
+import subprocess
+import warnings
 import pygame
 import sys
 import json
 import threading
 import time
 import ctypes
+import vlc
+import keyboard
 
 from button.Button import Button
 from game_controller import GameController
@@ -19,6 +23,29 @@ class MenuController():
         self.clock = pygame.time.Clock()
         self.BG = pygame.image.load("resources/assets/backmenu.png")
         
+        #video = mp.VideoFileClip("resources/kinematics/prologo.mp4")
+        #audio = mp.AudioFileClip("resources/kinematics/prologo.mp4")
+        #audio = audio.fx(mp.vfx.speedx, factor=0.46)
+        #video = video.set_audio(audio)
+        #video.preview()
+        
+        #warnings.filterwarnings("ignore", category=UserWarning, module=".*libpng.*")
+        
+        instance = vlc.Instance()
+        player = instance.media_player_new()
+        media = instance.media_new("resources/kinematics/prologo.mp4")
+        player.set_media(media)
+        player.set_fullscreen(True)
+        player.play()
+        
+        def close_video():
+            player.stop()
+            
+        keyboard.on_press_key("space", lambda _: close_video())
+        
+        while player.get_state() != vlc.State.Stopped:
+            pass
+        
         self.main_menu()
         
     def read_level(self):
@@ -30,34 +57,7 @@ class MenuController():
         return pygame.font.Font("resources/assets/font.ttf", size)
     
     def end(self):
-        pygame.mixer.init()
-        self.gc=None
-        r_flag=True
-        ve_sound = pygame.mixer.Sound("resources/music/win.wav")
-        pygame.mixer.Sound.play(ve_sound)
-        while r_flag:
-            self.screen.fill('black')
-            IM = pygame.image.load("resources/assets/end.png")
-            self.screen.blit(IM, (0, 0))
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    r_flag=False
-                    self.close()
-            
-            pygame.display.update()
-            time.sleep(5)
-            r_flag=False
-        
-        for t in threading.enumerate():
-            try:
-                if t.getName()!='MainThread':
-                    thread_id = t.ident
-                    thread_object = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread_id), ctypes.py_object(SystemExit))
-                    if thread_object == 0:
-                        raise ValueError("El hilo no pudo ser detenido")
-            except Exception as e:
-                print(str(e))
-        
+        print("----------------me mandaron a cerrar el juego--------------------")
         self.close()
 
     def restart(self):

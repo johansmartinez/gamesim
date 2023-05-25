@@ -8,7 +8,7 @@ class RandomNumber():
         self.xi=4
         self.min=0
         self.max=1
-
+    
     def calculate_ri(self):
         self.xi= ((self.a*self.xi)+self.c)%self.m
         return self.xi/(self.m-1)

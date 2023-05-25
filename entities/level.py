@@ -51,28 +51,29 @@ class Level():
     
     def collisions(self, projectile):
         colls = pygame.sprite.spritecollide(projectile, self.villain.getEnemies(), True)
-        for e in colls:
-            ve_sound = pygame.mixer.Sound("resources/music/hit.wav")
-            pygame.mixer.Sound.play(ve_sound)
-            self.player.increaseEnergy(10)
-            e.kill()
-            projectile.kill()
-        collsI = pygame.sprite.spritecollide(projectile, self.villain.getItems(), True)
-        for i in collsI:
-            self.powerup(i.get_power())
-            i.kill()
-            projectile.kill()
-            
-        villian_hit=projectile.get_rect().colliderect(self.villain.get_rect())
-        if villian_hit:
-            vh_sound = pygame.mixer.Sound("resources/music/hit_villain.wav")
-            pygame.mixer.Sound.play(vh_sound)
-            projectile.kill()
-            self.player.increaseEnergy(40)
-            
-            dead=self.villain.decrease_life(self.calculate_damage(GameConstants.DAMAGE_SHOT.value))
-            if dead:
-                self.stop()
+        if self.running:
+            for e in colls:
+                ve_sound = pygame.mixer.Sound("resources/music/hit.wav")
+                pygame.mixer.Sound.play(ve_sound)
+                self.player.increaseEnergy(10)
+                e.kill()
+                projectile.kill()
+            collsI = pygame.sprite.spritecollide(projectile, self.villain.getItems(), True)
+            for i in collsI:
+                self.powerup(i.get_power())
+                i.kill()
+                projectile.kill()
+                
+            villian_hit=projectile.get_rect().colliderect(self.villain.get_rect())
+            if villian_hit:
+                vh_sound = pygame.mixer.Sound("resources/music/hit_villain.wav")
+                pygame.mixer.Sound.play(vh_sound)
+                projectile.kill()
+                self.player.increaseEnergy(40)
+                
+                dead=self.villain.decrease_life(self.calculate_damage(GameConstants.DAMAGE_SHOT.value))
+                if dead:
+                    self.stop()
         
     def kill(self):
         self.running=False
